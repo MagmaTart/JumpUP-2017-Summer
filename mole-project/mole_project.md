@@ -1,7 +1,7 @@
 # Mole Project - DK-AVR을 활용한 두더지 잡기 게임
 
 ## Block Diagram
-![Block Diagram](images/SoominLee_mole-diagram_20170725.jpg)
+![Block Diagram](images/SoominLee_mole-diagram_20170725.JPG)
 
 ## 동작 설명
 다이어그램과 같이, 모든 LED와 버튼에 번호 부여
@@ -26,7 +26,7 @@ LED 점등 시간 : 기본 3초, 단계가 오를 때마다 0.4초씩 감소
 시간에 관계 없이, 20마리 잡으면 단계 상승
 
 ## Time Table
-![Time Table](images/SoominLee_mole-timetable_20170725.jpg)
+![Time Table](images/SoominLee_mole-timetable_20170725.JPG)
 
 ## 회로 구성
 ### Schematic - LEDs Part
