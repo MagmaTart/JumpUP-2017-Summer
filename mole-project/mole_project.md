@@ -1,5 +1,4 @@
 # Mole Project - DK-AVR을 활용한 두더지 잡기 게임
-------
 
 ## Block Diagram
 ![Block Diagram](SoominLee_mole-diagram_20170724.jpg)
