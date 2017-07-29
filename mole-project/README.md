@@ -27,3 +27,21 @@ LED 점등 시간 : 기본 3초, 단계가 오를 때마다 0.4초씩 감소
 
 ## Time Table
 ![Time Table](images/SoominLee_mole-timetable_20170725.JPG)
+
+## Flow Charts
+
+### 전체적인 플로우 차트
+
+![FlowChart1](images/SoominLee_mole_FlowChart_1_20170730.PNG)
+
+### 위 플로우 차트의 파트별 세부 플로우 차트
+
+상단 네모에 해당하는 전체 플로우 차트의 부분이 복사되어 있습니다. 각 플로우차트는 해당 부분을 세부화하여 나타낸 것입니다.
+
+![FlowChart2](images/SoominLee_mole_FlowChart_2_20170730.PNG)
+
+![FlowChart3](images/SoominLee_mole_FlowChart_3_20170730.PNG)
+
+![FlowChart4](images/SoominLee_mole_FlowChart_4_20170730.PNG)
+
+![FlowChart5](images/SoominLee_mole_FlowChart_5_20170730.PNG)
