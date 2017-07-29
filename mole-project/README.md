@@ -27,10 +27,3 @@ LED 점등 시간 : 기본 3초, 단계가 오를 때마다 0.4초씩 감소
 
 ## Time Table
 ![Time Table](images/SoominLee_mole-timetable_20170725.JPG)
-
-## 회로 구성
-### Schematic - LEDs Part
-![LED_Schematic](images/LEDSchematic.jpg)
-
-### Schematic - Buttons Part
-![Button_Schematic](images/BtnSchematic.jpg)
