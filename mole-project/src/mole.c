@@ -171,6 +171,7 @@ void shutdown_mole(int mole_number)
         break;
     }
 
+    missed++;
     mole_status[mole_number] = 0;
     PORT_MOLE = led;
 }
@@ -209,6 +210,11 @@ void level_up(int level)
 
     next_mole_set_delay -= 200;
     next_mole_living_times -= 200;
+}
+
+void gameover(void)
+{
+    //TODO : make this part
 }
 
 int main(void)
@@ -270,6 +276,11 @@ int main(void)
         {
             catched++;
             level_up(level);
+        }
+
+        if( missed >= 15)
+        {
+            gameover();
         }
     }
 }
