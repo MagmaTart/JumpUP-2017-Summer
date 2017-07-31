@@ -8,7 +8,7 @@
 
 * n번 LED가 점등중일 때 n번 버튼을 누르면, LED가 소등하고, 동시에 부저가 0.2초간 소리를 출력합니다.
 
-* LED를 점등하는 시간은 기본 3초이며, 단계가 오를 때마다 0.4초씩 감소합니다.
+* LED를 점등하는 시간은 기본 1.5초이며, 단계가 오를 때마다 0.2초씩 감소합니다.
 
 * LED의 점등 시간 안에 해당하는 버튼을 누르지 못했을 경우 소등합니다.
 
@@ -46,3 +46,9 @@
 ![FlowChart4](https://github.com/MagmaTart/JumpUP-2017-Summer/blob/master/mole-project/images/SoominLee_mole_FlowChart_4_20170730.PNG)
 
 ![FlowChart5](https://github.com/MagmaTart/JumpUP-2017-Summer/blob/master/mole-project/images/SoominLee_mole_FlowChart_5_20170730.PNG)
+
+## Additional Images
+
+### Level show System
+
+![Level_Show](https://github.com/MagmaTart/JumpUP-2017-Summer/blob/master/mole-project/images/Level_Show.png)
