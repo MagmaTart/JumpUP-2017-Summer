@@ -51,4 +51,4 @@
 
 ### Level show System
 
-![FlowChart1](https://github.com/MagmaTart/JumpUP-2017-Summer/blob/master/mole-project/images/Level_Show.PNG)
+![Level_Show](https://github.com/MagmaTart/JumpUP-2017-Summer/blob/master/mole-project/images/Level_Show.png)
