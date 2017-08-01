@@ -80,13 +80,13 @@ void buzzer(){
     }
 }
 
-
-/* INT0 routine : Mole 0 : Button 0 */
-ISR(INT0_vect)
+void kill_mole(int num)
 {
-    if(mole_status[0])
+    int moles[4] = { MOLE0, MOLE1, MOLE2, MOLE3 };
+
+    if(mole_status[num])
     {
-        led &= ~((1<<MOLE0) & 0xff);
+        led &= ~((1 << moles[num]) & 0xff);
         PORT_MOLE = led;
         catched++;
         buzzer();
@@ -94,43 +94,28 @@ ISR(INT0_vect)
     }
 }
 
+/* INT0 routine : Mole 0 : Button 0 */
+ISR(INT0_vect)
+{
+    kill_mole(0);
+}
+
 /* INT1 routine : Mole 1 : Button 1 */
 ISR(INT1_vect)
 {
-    if(mole_status[1])
-    {
-        led &= ~((1<<MOLE1) & 0xff);
-        PORT_MOLE = led;
-        catched++;
-        buzzer();
-        mole_status[1] = 0;
-    }
+    kill_mole(1);
 }
 
 /* INT2 routine : Mole 2 : Button 2 */
 ISR(INT2_vect)
 {
-    if(mole_status[2])
-    {
-        led &= ~((1<<MOLE2) & 0xff);
-        PORT_MOLE = led;
-        catched++;
-        buzzer();
-        mole_status[2] = 0;
-    }
+    kill_mole(2);
 }
 
 /* INT3 routine : Mole 3 : Button 3 */
 ISR(INT3_vect)
 {
-    if(mole_status[3])
-    {
-        led &= ~((1<<MOLE3) & 0xff);
-        PORT_MOLE = led;
-        catched++;
-        buzzer();
-        mole_status[3] = 0;
-    }
+    kill_mole(3);
 }
 
 /* Output Compare : Matched */
