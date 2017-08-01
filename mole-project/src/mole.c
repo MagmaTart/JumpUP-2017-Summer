@@ -21,6 +21,7 @@
 #define DDR_LEVEL_PORT_E    DDRE
 #define LEVEL_PORT_C        PORTC
 #define LEVEL_PORT_E        PORTE
+#define BUZZER              PORT6
 
 /* About TIMER */
 #define CPU_CLOCK       16000000
@@ -48,6 +49,8 @@ volatile unsigned int mole_living_times[4] = {1500, 1500, 1500, 1500};      // C
 
 volatile unsigned int new_mole_delay = 1500;             // Delay of set new moles
 
+void delay(unsigned int);
+
 /* Interrupt Initializing */
 void init_interrupt()
 {
@@ -60,11 +63,23 @@ void init_interrupt()
     /* Timer/Counter0 Initializing */
     /* Output Compare Match */
     TCCR0A = (1<<WGM01) | (0<<WGM00);
-    TCCR0B = (0<<WGM02) | (0<<CS02) | (1<<CS01) | (1<<CS00);
+    TCCR0B = (0<<WGM02) | (0<<CS02) | (1<<CS01) | (1<<CS00);        //Prescaler : 64 (011)
     TCNT0 = 0;
     OCR0A = (CPU_CLOCK / TICKS_PER_SEC / PRESCALER) - 1;
-    TIMSK0 = (0<<OCIE0B) | (1<<OCIE0A) | (1<<TOIE0);
+    TIMSK0 = (0<<OCIE0B) | (1<<OCIE0A) | (0<<TOIE0);
 }
+
+void buzzer(){
+    int i=0;
+    while(i++<100)
+    {
+        PORTD |= (1<<BUZZER);
+        delay(1);
+        PORTD |= (0<<BUZZER);
+        delay(1);
+    }
+}
+
 
 /* INT0 routine : Mole 0 : Button 0 */
 ISR(INT0_vect)
@@ -74,6 +89,7 @@ ISR(INT0_vect)
         led &= ~((1<<MOLE0) & 0xff);
         PORT_MOLE = led;
         catched++;
+        buzzer();
         mole_status[0] = 0;
     }
 }
@@ -86,6 +102,7 @@ ISR(INT1_vect)
         led &= ~((1<<MOLE1) & 0xff);
         PORT_MOLE = led;
         catched++;
+        buzzer();
         mole_status[1] = 0;
     }
 }
@@ -98,6 +115,7 @@ ISR(INT2_vect)
         led &= ~((1<<MOLE2) & 0xff);
         PORT_MOLE = led;
         catched++;
+        buzzer();
         mole_status[2] = 0;
     }
 }
@@ -110,6 +128,7 @@ ISR(INT3_vect)
         led &= ~((1<<MOLE3) & 0xff);
         PORT_MOLE = led;
         catched++;
+        buzzer();
         mole_status[3] = 0;
     }
 }
@@ -177,7 +196,7 @@ void shutdown_mole(int mole_number)
 }
 
 /* Increase difficulty */
-void level_up(int level)
+void level_up(void)
 {
     switch(level){
     case 1:
@@ -189,15 +208,15 @@ void level_up(int level)
         break;
     case 3:
         LEVEL_PORT_C &= ~((1<<PORT7) & 0xff);
-        LEVEL_PORT_E |= (1<<PORT7);
+        LEVEL_PORT_E |= (1<<PORT6);
         break;
     case 4:
-        LEVEL_PORT_E &= ~((1<<PORT7) & 0xff);
+        LEVEL_PORT_E &= ~((1<<PORT6) & 0xff);
         LEVEL_PORT_C |= (1<<PORT6) | (1<<PORT7);
         break;
     case 5:
         LEVEL_PORT_C &= ~((1<<PORT7) & 0xff);
-        LEVEL_PORT_E |= (1<<PORT7);
+        LEVEL_PORT_E |= (1<<PORT6);
         break;
     case 6:
         LEVEL_PORT_C |= (1<<PORT7);
@@ -228,9 +247,11 @@ int main(void)
     PORT_MOLE = 0x00;
 
     DDR_LEVEL_PORT_C |= (1<<PORT6) | (1<<PORT7);    //PC6 : Green, PC7 : Yellow
-    DDR_LEVEL_PORT_E |= (1<<PORT7);                 //PE7 : Red
+    DDR_LEVEL_PORT_E |= (1<<PORT6);                 //PE7 : Red
     LEVEL_PORT_C = 0x00;
     LEVEL_PORT_E = 0x00;
+
+    DDRD |= (1<<BUZZER);                            //Buzzer port setting : PD6
 
     init_interrupt();
 
@@ -275,7 +296,7 @@ int main(void)
         if( catched > 0 && catched % 20 == 0 && catched <= 140)
         {
             catched++;
-            level_up(level);
+            level_up();
         }
 
         if( missed >= 15)

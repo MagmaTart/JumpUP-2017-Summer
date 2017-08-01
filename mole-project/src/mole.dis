@@ -7,13 +7,13 @@ Disassembly of section .text:
 00000000 <__vectors>:
    0:	55 c0       	rjmp	.+170    	; 0xac <__ctors_end>
    2:	00 00       	nop
-   4:	81 c0       	rjmp	.+258    	; 0x108 <__vector_1>
+   4:	b7 c0       	rjmp	.+366    	; 0x174 <__vector_1>
    6:	00 00       	nop
-   8:	a8 c0       	rjmp	.+336    	; 0x15a <__vector_2>
+   8:	f3 c0       	rjmp	.+486    	; 0x1f0 <__vector_2>
    a:	00 00       	nop
-   c:	cf c0       	rjmp	.+414    	; 0x1ac <__vector_3>
+   c:	2f c1       	rjmp	.+606    	; 0x26c <__vector_3>
    e:	00 00       	nop
-  10:	f6 c0       	rjmp	.+492    	; 0x1fe <__vector_4>
+  10:	6b c1       	rjmp	.+726    	; 0x2e8 <__vector_4>
   12:	00 00       	nop
   14:	66 c0       	rjmp	.+204    	; 0xe2 <__bad_interrupt>
   16:	00 00       	nop
@@ -47,7 +47,7 @@ Disassembly of section .text:
   4e:	00 00       	nop
   50:	48 c0       	rjmp	.+144    	; 0xe2 <__bad_interrupt>
   52:	00 00       	nop
-  54:	fd c0       	rjmp	.+506    	; 0x250 <__vector_21>
+  54:	59 c0       	rjmp	.+178    	; 0x108 <__vector_21>
   56:	00 00       	nop
   58:	44 c0       	rjmp	.+136    	; 0xe2 <__bad_interrupt>
   5a:	00 00       	nop
@@ -104,8 +104,8 @@ Disassembly of section .text:
   b8:	11 e0       	ldi	r17, 0x01	; 1
   ba:	a0 e0       	ldi	r26, 0x00	; 0
   bc:	b1 e0       	ldi	r27, 0x01	; 1
-  be:	ee e7       	ldi	r30, 0x7E	; 126
-  c0:	f6 e0       	ldi	r31, 0x06	; 6
+  be:	e0 e6       	ldi	r30, 0x60	; 96
+  c0:	f7 e0       	ldi	r31, 0x07	; 7
   c2:	02 c0       	rjmp	.+4      	; 0xc8 <__do_copy_data+0x10>
   c4:	05 90       	lpm	r0, Z+
   c6:	0d 92       	st	X+, r0
@@ -126,8 +126,8 @@ Disassembly of section .text:
   d8:	a3 32       	cpi	r26, 0x23	; 35
   da:	b2 07       	cpc	r27, r18
   dc:	e1 f7       	brne	.-8      	; 0xd6 <.do_clear_bss_loop>
-  de:	72 d1       	rcall	.+740    	; 0x3c4 <main>
-  e0:	cc c2       	rjmp	.+1432   	; 0x67a <_exit>
+  de:	e6 d1       	rcall	.+972    	; 0x4ac <main>
+  e0:	3d c3       	rjmp	.+1658   	; 0x75c <_exit>
 
 000000e2 <__bad_interrupt>:
   e2:	8e cf       	rjmp	.-228    	; 0x0 <__vectors>
@@ -166,11 +166,12 @@ void init_interrupt()
  102:	80 93 6e 00 	sts	0x006E, r24
  106:	08 95       	ret
 
-00000108 <__vector_1>:
+00000108 <__vector_21>:
+    }
 }
 
-/* INT0 routine : Mole 0 : Button 0 */
-ISR(INT0_vect)
+/* Output Compare : Matched */
+ISR(TIMER0_COMPA_vect)
 {
  108:	1f 92       	push	r1
  10a:	0f 92       	push	r0
@@ -179,910 +180,1046 @@ ISR(INT0_vect)
  110:	11 24       	eor	r1, r1
  112:	8f 93       	push	r24
  114:	9f 93       	push	r25
-    if(mole_status[0])
- 116:	80 91 14 01 	lds	r24, 0x0114
- 11a:	90 91 15 01 	lds	r25, 0x0115
- 11e:	89 2b       	or	r24, r25
- 120:	a9 f0       	breq	.+42     	; 0x14c <__vector_1+0x44>
-    {
-        led &= ~((1<<MOLE0) & 0xff);
- 122:	80 91 20 01 	lds	r24, 0x0120
- 126:	8f 77       	andi	r24, 0x7F	; 127
- 128:	80 93 20 01 	sts	0x0120, r24
-        PORT_MOLE = led;
- 12c:	80 91 20 01 	lds	r24, 0x0120
- 130:	85 b9       	out	0x05, r24	; 5
-        catched++;
- 132:	80 91 1e 01 	lds	r24, 0x011E
- 136:	90 91 1f 01 	lds	r25, 0x011F
- 13a:	01 96       	adiw	r24, 0x01	; 1
- 13c:	90 93 1f 01 	sts	0x011F, r25
- 140:	80 93 1e 01 	sts	0x011E, r24
-        mole_status[0] = 0;
- 144:	10 92 15 01 	sts	0x0115, r1
- 148:	10 92 14 01 	sts	0x0114, r1
-    }
-}
- 14c:	9f 91       	pop	r25
- 14e:	8f 91       	pop	r24
- 150:	0f 90       	pop	r0
- 152:	0f be       	out	0x3f, r0	; 63
- 154:	0f 90       	pop	r0
- 156:	1f 90       	pop	r1
- 158:	18 95       	reti
-
-0000015a <__vector_2>:
-
-/* INT1 routine : Mole 1 : Button 1 */
-ISR(INT1_vect)
-{
- 15a:	1f 92       	push	r1
- 15c:	0f 92       	push	r0
- 15e:	0f b6       	in	r0, 0x3f	; 63
- 160:	0f 92       	push	r0
- 162:	11 24       	eor	r1, r1
- 164:	8f 93       	push	r24
- 166:	9f 93       	push	r25
-    if(mole_status[1])
- 168:	80 91 16 01 	lds	r24, 0x0116
- 16c:	90 91 17 01 	lds	r25, 0x0117
- 170:	89 2b       	or	r24, r25
- 172:	a9 f0       	breq	.+42     	; 0x19e <__vector_2+0x44>
-    {
-        led &= ~((1<<MOLE1) & 0xff);
- 174:	80 91 20 01 	lds	r24, 0x0120
- 178:	8f 7b       	andi	r24, 0xBF	; 191
- 17a:	80 93 20 01 	sts	0x0120, r24
-        PORT_MOLE = led;
- 17e:	80 91 20 01 	lds	r24, 0x0120
- 182:	85 b9       	out	0x05, r24	; 5
-        catched++;
- 184:	80 91 1e 01 	lds	r24, 0x011E
- 188:	90 91 1f 01 	lds	r25, 0x011F
- 18c:	01 96       	adiw	r24, 0x01	; 1
- 18e:	90 93 1f 01 	sts	0x011F, r25
- 192:	80 93 1e 01 	sts	0x011E, r24
-        mole_status[1] = 0;
- 196:	10 92 17 01 	sts	0x0117, r1
- 19a:	10 92 16 01 	sts	0x0116, r1
-    }
-}
- 19e:	9f 91       	pop	r25
- 1a0:	8f 91       	pop	r24
- 1a2:	0f 90       	pop	r0
- 1a4:	0f be       	out	0x3f, r0	; 63
- 1a6:	0f 90       	pop	r0
- 1a8:	1f 90       	pop	r1
- 1aa:	18 95       	reti
-
-000001ac <__vector_3>:
-
-/* INT2 routine : Mole 2 : Button 2 */
-ISR(INT2_vect)
-{
- 1ac:	1f 92       	push	r1
- 1ae:	0f 92       	push	r0
- 1b0:	0f b6       	in	r0, 0x3f	; 63
- 1b2:	0f 92       	push	r0
- 1b4:	11 24       	eor	r1, r1
- 1b6:	8f 93       	push	r24
- 1b8:	9f 93       	push	r25
-    if(mole_status[2])
- 1ba:	80 91 18 01 	lds	r24, 0x0118
- 1be:	90 91 19 01 	lds	r25, 0x0119
- 1c2:	89 2b       	or	r24, r25
- 1c4:	a9 f0       	breq	.+42     	; 0x1f0 <__vector_3+0x44>
-    {
-        led &= ~((1<<MOLE2) & 0xff);
- 1c6:	80 91 20 01 	lds	r24, 0x0120
- 1ca:	8f 7d       	andi	r24, 0xDF	; 223
- 1cc:	80 93 20 01 	sts	0x0120, r24
-        PORT_MOLE = led;
- 1d0:	80 91 20 01 	lds	r24, 0x0120
- 1d4:	85 b9       	out	0x05, r24	; 5
-        catched++;
- 1d6:	80 91 1e 01 	lds	r24, 0x011E
- 1da:	90 91 1f 01 	lds	r25, 0x011F
- 1de:	01 96       	adiw	r24, 0x01	; 1
- 1e0:	90 93 1f 01 	sts	0x011F, r25
- 1e4:	80 93 1e 01 	sts	0x011E, r24
-        mole_status[2] = 0;
- 1e8:	10 92 19 01 	sts	0x0119, r1
- 1ec:	10 92 18 01 	sts	0x0118, r1
-    }
-}
- 1f0:	9f 91       	pop	r25
- 1f2:	8f 91       	pop	r24
- 1f4:	0f 90       	pop	r0
- 1f6:	0f be       	out	0x3f, r0	; 63
- 1f8:	0f 90       	pop	r0
- 1fa:	1f 90       	pop	r1
- 1fc:	18 95       	reti
-
-000001fe <__vector_4>:
-
-/* INT3 routine : Mole 3 : Button 3 */
-ISR(INT3_vect)
-{
- 1fe:	1f 92       	push	r1
- 200:	0f 92       	push	r0
- 202:	0f b6       	in	r0, 0x3f	; 63
- 204:	0f 92       	push	r0
- 206:	11 24       	eor	r1, r1
- 208:	8f 93       	push	r24
- 20a:	9f 93       	push	r25
-    if(mole_status[3])
- 20c:	80 91 1a 01 	lds	r24, 0x011A
- 210:	90 91 1b 01 	lds	r25, 0x011B
- 214:	89 2b       	or	r24, r25
- 216:	a9 f0       	breq	.+42     	; 0x242 <__vector_4+0x44>
-    {
-        led &= ~((1<<MOLE3) & 0xff);
- 218:	80 91 20 01 	lds	r24, 0x0120
- 21c:	8f 7e       	andi	r24, 0xEF	; 239
- 21e:	80 93 20 01 	sts	0x0120, r24
-        PORT_MOLE = led;
- 222:	80 91 20 01 	lds	r24, 0x0120
- 226:	85 b9       	out	0x05, r24	; 5
-        catched++;
- 228:	80 91 1e 01 	lds	r24, 0x011E
- 22c:	90 91 1f 01 	lds	r25, 0x011F
- 230:	01 96       	adiw	r24, 0x01	; 1
- 232:	90 93 1f 01 	sts	0x011F, r25
- 236:	80 93 1e 01 	sts	0x011E, r24
-        mole_status[3] = 0;
- 23a:	10 92 1b 01 	sts	0x011B, r1
- 23e:	10 92 1a 01 	sts	0x011A, r1
-    }
-}
- 242:	9f 91       	pop	r25
- 244:	8f 91       	pop	r24
- 246:	0f 90       	pop	r0
- 248:	0f be       	out	0x3f, r0	; 63
- 24a:	0f 90       	pop	r0
- 24c:	1f 90       	pop	r1
- 24e:	18 95       	reti
-
-00000250 <__vector_21>:
-
-/* Output Compare : Matched */
-ISR(TIMER0_COMPA_vect)
-{
- 250:	1f 92       	push	r1
- 252:	0f 92       	push	r0
- 254:	0f b6       	in	r0, 0x3f	; 63
- 256:	0f 92       	push	r0
- 258:	11 24       	eor	r1, r1
- 25a:	8f 93       	push	r24
- 25c:	9f 93       	push	r25
     tick++;
- 25e:	80 91 21 01 	lds	r24, 0x0121
- 262:	90 91 22 01 	lds	r25, 0x0122
- 266:	01 96       	adiw	r24, 0x01	; 1
- 268:	90 93 22 01 	sts	0x0122, r25
- 26c:	80 93 21 01 	sts	0x0121, r24
+ 116:	80 91 21 01 	lds	r24, 0x0121
+ 11a:	90 91 22 01 	lds	r25, 0x0122
+ 11e:	01 96       	adiw	r24, 0x01	; 1
+ 120:	90 93 22 01 	sts	0x0122, r25
+ 124:	80 93 21 01 	sts	0x0121, r24
 }
- 270:	9f 91       	pop	r25
- 272:	8f 91       	pop	r24
- 274:	0f 90       	pop	r0
- 276:	0f be       	out	0x3f, r0	; 63
- 278:	0f 90       	pop	r0
- 27a:	1f 90       	pop	r1
- 27c:	18 95       	reti
+ 128:	9f 91       	pop	r25
+ 12a:	8f 91       	pop	r24
+ 12c:	0f 90       	pop	r0
+ 12e:	0f be       	out	0x3f, r0	; 63
+ 130:	0f 90       	pop	r0
+ 132:	1f 90       	pop	r1
+ 134:	18 95       	reti
 
-0000027e <delay>:
+00000136 <delay>:
 
 /* Custom delay function using Timer */
 void delay(unsigned int msec)
 {
     tick = 0;
- 27e:	10 92 22 01 	sts	0x0122, r1
- 282:	10 92 21 01 	sts	0x0121, r1
+ 136:	10 92 22 01 	sts	0x0122, r1
+ 13a:	10 92 21 01 	sts	0x0121, r1
     while(msec > tick);
- 286:	20 91 21 01 	lds	r18, 0x0121
- 28a:	30 91 22 01 	lds	r19, 0x0122
- 28e:	28 17       	cp	r18, r24
- 290:	39 07       	cpc	r19, r25
- 292:	c8 f3       	brcs	.-14     	; 0x286 <delay+0x8>
+ 13e:	20 91 21 01 	lds	r18, 0x0121
+ 142:	30 91 22 01 	lds	r19, 0x0122
+ 146:	28 17       	cp	r18, r24
+ 148:	39 07       	cpc	r19, r25
+ 14a:	c8 f3       	brcs	.-14     	; 0x13e <delay+0x8>
 }
- 294:	08 95       	ret
+ 14c:	08 95       	ret
 
-00000296 <new_mole>:
+0000014e <buzzer>:
+    TCNT0 = 0;
+    OCR0A = (CPU_CLOCK / TICKS_PER_SEC / PRESCALER) - 1;
+    TIMSK0 = (0<<OCIE0B) | (1<<OCIE0A) | (1<<TOIE0);
+}
+
+void buzzer(){
+ 14e:	cf 93       	push	r28
+ 150:	df 93       	push	r29
+    int i=0;
+    while(i++<100)
+ 152:	c5 e6       	ldi	r28, 0x65	; 101
+ 154:	d0 e0       	ldi	r29, 0x00	; 0
+ 156:	21 97       	sbiw	r28, 0x01	; 1
+ 158:	51 f0       	breq	.+20     	; 0x16e <buzzer+0x20>
+    {
+        PORTD |= (1<<BUZZER);
+ 15a:	5e 9a       	sbi	0x0b, 6	; 11
+        delay(1);
+ 15c:	81 e0       	ldi	r24, 0x01	; 1
+ 15e:	90 e0       	ldi	r25, 0x00	; 0
+ 160:	ea df       	rcall	.-44     	; 0x136 <delay>
+ 162:	8b b1       	in	r24, 0x0b	; 11
+        PORTD |= (0<<BUZZER);
+ 164:	8b b9       	out	0x0b, r24	; 11
+ 166:	81 e0       	ldi	r24, 0x01	; 1
+        delay(1);
+ 168:	90 e0       	ldi	r25, 0x00	; 0
+ 16a:	e5 df       	rcall	.-54     	; 0x136 <delay>
+ 16c:	f4 cf       	rjmp	.-24     	; 0x156 <buzzer+0x8>
+ 16e:	df 91       	pop	r29
+ 170:	cf 91       	pop	r28
+    }
+}
+ 172:	08 95       	ret
+
+00000174 <__vector_1>:
+
+
+/* INT0 routine : Mole 0 : Button 0 */
+ISR(INT0_vect)
+{
+ 174:	1f 92       	push	r1
+ 176:	0f 92       	push	r0
+ 178:	0f b6       	in	r0, 0x3f	; 63
+ 17a:	0f 92       	push	r0
+ 17c:	11 24       	eor	r1, r1
+ 17e:	2f 93       	push	r18
+ 180:	3f 93       	push	r19
+ 182:	4f 93       	push	r20
+ 184:	5f 93       	push	r21
+ 186:	6f 93       	push	r22
+ 188:	7f 93       	push	r23
+ 18a:	8f 93       	push	r24
+ 18c:	9f 93       	push	r25
+ 18e:	af 93       	push	r26
+ 190:	bf 93       	push	r27
+ 192:	ef 93       	push	r30
+ 194:	ff 93       	push	r31
+    if(mole_status[0])
+ 196:	80 91 14 01 	lds	r24, 0x0114
+ 19a:	90 91 15 01 	lds	r25, 0x0115
+ 19e:	89 2b       	or	r24, r25
+ 1a0:	b1 f0       	breq	.+44     	; 0x1ce <__vector_1+0x5a>
+    {
+        led &= ~((1<<MOLE0) & 0xff);
+ 1a2:	80 91 20 01 	lds	r24, 0x0120
+ 1a6:	8f 77       	andi	r24, 0x7F	; 127
+ 1a8:	80 93 20 01 	sts	0x0120, r24
+        PORT_MOLE = led;
+ 1ac:	80 91 20 01 	lds	r24, 0x0120
+ 1b0:	85 b9       	out	0x05, r24	; 5
+        catched++;
+ 1b2:	80 91 1e 01 	lds	r24, 0x011E
+ 1b6:	90 91 1f 01 	lds	r25, 0x011F
+ 1ba:	01 96       	adiw	r24, 0x01	; 1
+ 1bc:	90 93 1f 01 	sts	0x011F, r25
+ 1c0:	80 93 1e 01 	sts	0x011E, r24
+        buzzer();
+ 1c4:	c4 df       	rcall	.-120    	; 0x14e <buzzer>
+ 1c6:	10 92 15 01 	sts	0x0115, r1
+        mole_status[0] = 0;
+ 1ca:	10 92 14 01 	sts	0x0114, r1
+ 1ce:	ff 91       	pop	r31
+    }
+}
+ 1d0:	ef 91       	pop	r30
+ 1d2:	bf 91       	pop	r27
+ 1d4:	af 91       	pop	r26
+ 1d6:	9f 91       	pop	r25
+ 1d8:	8f 91       	pop	r24
+ 1da:	7f 91       	pop	r23
+ 1dc:	6f 91       	pop	r22
+ 1de:	5f 91       	pop	r21
+ 1e0:	4f 91       	pop	r20
+ 1e2:	3f 91       	pop	r19
+ 1e4:	2f 91       	pop	r18
+ 1e6:	0f 90       	pop	r0
+ 1e8:	0f be       	out	0x3f, r0	; 63
+ 1ea:	0f 90       	pop	r0
+ 1ec:	1f 90       	pop	r1
+ 1ee:	18 95       	reti
+
+000001f0 <__vector_2>:
+
+/* INT1 routine : Mole 1 : Button 1 */
+ISR(INT1_vect)
+{
+ 1f0:	1f 92       	push	r1
+ 1f2:	0f 92       	push	r0
+ 1f4:	0f b6       	in	r0, 0x3f	; 63
+ 1f6:	0f 92       	push	r0
+ 1f8:	11 24       	eor	r1, r1
+ 1fa:	2f 93       	push	r18
+ 1fc:	3f 93       	push	r19
+ 1fe:	4f 93       	push	r20
+ 200:	5f 93       	push	r21
+ 202:	6f 93       	push	r22
+ 204:	7f 93       	push	r23
+ 206:	8f 93       	push	r24
+ 208:	9f 93       	push	r25
+ 20a:	af 93       	push	r26
+ 20c:	bf 93       	push	r27
+ 20e:	ef 93       	push	r30
+ 210:	ff 93       	push	r31
+    if(mole_status[1])
+ 212:	80 91 16 01 	lds	r24, 0x0116
+ 216:	90 91 17 01 	lds	r25, 0x0117
+ 21a:	89 2b       	or	r24, r25
+ 21c:	b1 f0       	breq	.+44     	; 0x24a <__vector_2+0x5a>
+    {
+        led &= ~((1<<MOLE1) & 0xff);
+ 21e:	80 91 20 01 	lds	r24, 0x0120
+ 222:	8f 7b       	andi	r24, 0xBF	; 191
+ 224:	80 93 20 01 	sts	0x0120, r24
+        PORT_MOLE = led;
+ 228:	80 91 20 01 	lds	r24, 0x0120
+ 22c:	85 b9       	out	0x05, r24	; 5
+        catched++;
+ 22e:	80 91 1e 01 	lds	r24, 0x011E
+ 232:	90 91 1f 01 	lds	r25, 0x011F
+ 236:	01 96       	adiw	r24, 0x01	; 1
+ 238:	90 93 1f 01 	sts	0x011F, r25
+ 23c:	80 93 1e 01 	sts	0x011E, r24
+        buzzer();
+ 240:	86 df       	rcall	.-244    	; 0x14e <buzzer>
+ 242:	10 92 17 01 	sts	0x0117, r1
+        mole_status[1] = 0;
+ 246:	10 92 16 01 	sts	0x0116, r1
+ 24a:	ff 91       	pop	r31
+    }
+}
+ 24c:	ef 91       	pop	r30
+ 24e:	bf 91       	pop	r27
+ 250:	af 91       	pop	r26
+ 252:	9f 91       	pop	r25
+ 254:	8f 91       	pop	r24
+ 256:	7f 91       	pop	r23
+ 258:	6f 91       	pop	r22
+ 25a:	5f 91       	pop	r21
+ 25c:	4f 91       	pop	r20
+ 25e:	3f 91       	pop	r19
+ 260:	2f 91       	pop	r18
+ 262:	0f 90       	pop	r0
+ 264:	0f be       	out	0x3f, r0	; 63
+ 266:	0f 90       	pop	r0
+ 268:	1f 90       	pop	r1
+ 26a:	18 95       	reti
+
+0000026c <__vector_3>:
+
+/* INT2 routine : Mole 2 : Button 2 */
+ISR(INT2_vect)
+{
+ 26c:	1f 92       	push	r1
+ 26e:	0f 92       	push	r0
+ 270:	0f b6       	in	r0, 0x3f	; 63
+ 272:	0f 92       	push	r0
+ 274:	11 24       	eor	r1, r1
+ 276:	2f 93       	push	r18
+ 278:	3f 93       	push	r19
+ 27a:	4f 93       	push	r20
+ 27c:	5f 93       	push	r21
+ 27e:	6f 93       	push	r22
+ 280:	7f 93       	push	r23
+ 282:	8f 93       	push	r24
+ 284:	9f 93       	push	r25
+ 286:	af 93       	push	r26
+ 288:	bf 93       	push	r27
+ 28a:	ef 93       	push	r30
+ 28c:	ff 93       	push	r31
+    if(mole_status[2])
+ 28e:	80 91 18 01 	lds	r24, 0x0118
+ 292:	90 91 19 01 	lds	r25, 0x0119
+ 296:	89 2b       	or	r24, r25
+ 298:	b1 f0       	breq	.+44     	; 0x2c6 <__vector_3+0x5a>
+    {
+        led &= ~((1<<MOLE2) & 0xff);
+ 29a:	80 91 20 01 	lds	r24, 0x0120
+ 29e:	8f 7d       	andi	r24, 0xDF	; 223
+ 2a0:	80 93 20 01 	sts	0x0120, r24
+        PORT_MOLE = led;
+ 2a4:	80 91 20 01 	lds	r24, 0x0120
+ 2a8:	85 b9       	out	0x05, r24	; 5
+        catched++;
+ 2aa:	80 91 1e 01 	lds	r24, 0x011E
+ 2ae:	90 91 1f 01 	lds	r25, 0x011F
+ 2b2:	01 96       	adiw	r24, 0x01	; 1
+ 2b4:	90 93 1f 01 	sts	0x011F, r25
+ 2b8:	80 93 1e 01 	sts	0x011E, r24
+        buzzer();
+ 2bc:	48 df       	rcall	.-368    	; 0x14e <buzzer>
+ 2be:	10 92 19 01 	sts	0x0119, r1
+        mole_status[2] = 0;
+ 2c2:	10 92 18 01 	sts	0x0118, r1
+ 2c6:	ff 91       	pop	r31
+    }
+}
+ 2c8:	ef 91       	pop	r30
+ 2ca:	bf 91       	pop	r27
+ 2cc:	af 91       	pop	r26
+ 2ce:	9f 91       	pop	r25
+ 2d0:	8f 91       	pop	r24
+ 2d2:	7f 91       	pop	r23
+ 2d4:	6f 91       	pop	r22
+ 2d6:	5f 91       	pop	r21
+ 2d8:	4f 91       	pop	r20
+ 2da:	3f 91       	pop	r19
+ 2dc:	2f 91       	pop	r18
+ 2de:	0f 90       	pop	r0
+ 2e0:	0f be       	out	0x3f, r0	; 63
+ 2e2:	0f 90       	pop	r0
+ 2e4:	1f 90       	pop	r1
+ 2e6:	18 95       	reti
+
+000002e8 <__vector_4>:
+
+/* INT3 routine : Mole 3 : Button 3 */
+ISR(INT3_vect)
+{
+ 2e8:	1f 92       	push	r1
+ 2ea:	0f 92       	push	r0
+ 2ec:	0f b6       	in	r0, 0x3f	; 63
+ 2ee:	0f 92       	push	r0
+ 2f0:	11 24       	eor	r1, r1
+ 2f2:	2f 93       	push	r18
+ 2f4:	3f 93       	push	r19
+ 2f6:	4f 93       	push	r20
+ 2f8:	5f 93       	push	r21
+ 2fa:	6f 93       	push	r22
+ 2fc:	7f 93       	push	r23
+ 2fe:	8f 93       	push	r24
+ 300:	9f 93       	push	r25
+ 302:	af 93       	push	r26
+ 304:	bf 93       	push	r27
+ 306:	ef 93       	push	r30
+ 308:	ff 93       	push	r31
+    if(mole_status[3])
+ 30a:	80 91 1a 01 	lds	r24, 0x011A
+ 30e:	90 91 1b 01 	lds	r25, 0x011B
+ 312:	89 2b       	or	r24, r25
+ 314:	b1 f0       	breq	.+44     	; 0x342 <__vector_4+0x5a>
+    {
+        led &= ~((1<<MOLE3) & 0xff);
+ 316:	80 91 20 01 	lds	r24, 0x0120
+ 31a:	8f 7e       	andi	r24, 0xEF	; 239
+ 31c:	80 93 20 01 	sts	0x0120, r24
+        PORT_MOLE = led;
+ 320:	80 91 20 01 	lds	r24, 0x0120
+ 324:	85 b9       	out	0x05, r24	; 5
+        catched++;
+ 326:	80 91 1e 01 	lds	r24, 0x011E
+ 32a:	90 91 1f 01 	lds	r25, 0x011F
+ 32e:	01 96       	adiw	r24, 0x01	; 1
+ 330:	90 93 1f 01 	sts	0x011F, r25
+ 334:	80 93 1e 01 	sts	0x011E, r24
+        buzzer();
+ 338:	0a df       	rcall	.-492    	; 0x14e <buzzer>
+ 33a:	10 92 1b 01 	sts	0x011B, r1
+        mole_status[3] = 0;
+ 33e:	10 92 1a 01 	sts	0x011A, r1
+ 342:	ff 91       	pop	r31
+    }
+}
+ 344:	ef 91       	pop	r30
+ 346:	bf 91       	pop	r27
+ 348:	af 91       	pop	r26
+ 34a:	9f 91       	pop	r25
+ 34c:	8f 91       	pop	r24
+ 34e:	7f 91       	pop	r23
+ 350:	6f 91       	pop	r22
+ 352:	5f 91       	pop	r21
+ 354:	4f 91       	pop	r20
+ 356:	3f 91       	pop	r19
+ 358:	2f 91       	pop	r18
+ 35a:	0f 90       	pop	r0
+ 35c:	0f be       	out	0x3f, r0	; 63
+ 35e:	0f 90       	pop	r0
+ 360:	1f 90       	pop	r1
+ 362:	18 95       	reti
+
+00000364 <new_mole>:
+}
 
 /* Set new mole and show */
 void new_mole(int new)
 {
     mole_status[new] = 1;
- 296:	9c 01       	movw	r18, r24
- 298:	22 0f       	add	r18, r18
- 29a:	33 1f       	adc	r19, r19
- 29c:	f9 01       	movw	r30, r18
- 29e:	ec 5e       	subi	r30, 0xEC	; 236
- 2a0:	fe 4f       	sbci	r31, 0xFE	; 254
- 2a2:	41 e0       	ldi	r20, 0x01	; 1
- 2a4:	50 e0       	ldi	r21, 0x00	; 0
- 2a6:	51 83       	std	Z+1, r21	; 0x01
- 2a8:	40 83       	st	Z, r20
+ 364:	9c 01       	movw	r18, r24
+ 366:	22 0f       	add	r18, r18
+ 368:	33 1f       	adc	r19, r19
+ 36a:	f9 01       	movw	r30, r18
+ 36c:	ec 5e       	subi	r30, 0xEC	; 236
+ 36e:	fe 4f       	sbci	r31, 0xFE	; 254
+ 370:	41 e0       	ldi	r20, 0x01	; 1
+ 372:	50 e0       	ldi	r21, 0x00	; 0
+ 374:	51 83       	std	Z+1, r21	; 0x01
+ 376:	40 83       	st	Z, r20
     mole_living_times[new] = next_mole_living_times;
- 2aa:	40 91 10 01 	lds	r20, 0x0110
- 2ae:	50 91 11 01 	lds	r21, 0x0111
- 2b2:	f9 01       	movw	r30, r18
- 2b4:	ea 5f       	subi	r30, 0xFA	; 250
- 2b6:	fe 4f       	sbci	r31, 0xFE	; 254
- 2b8:	51 83       	std	Z+1, r21	; 0x01
- 2ba:	40 83       	st	Z, r20
+ 378:	40 91 10 01 	lds	r20, 0x0110
+ 37c:	50 91 11 01 	lds	r21, 0x0111
+ 380:	f9 01       	movw	r30, r18
+ 382:	ea 5f       	subi	r30, 0xFA	; 250
+ 384:	fe 4f       	sbci	r31, 0xFE	; 254
+ 386:	51 83       	std	Z+1, r21	; 0x01
+ 388:	40 83       	st	Z, r20
 
     switch(new){
- 2bc:	81 30       	cpi	r24, 0x01	; 1
- 2be:	91 05       	cpc	r25, r1
- 2c0:	81 f0       	breq	.+32     	; 0x2e2 <new_mole+0x4c>
- 2c2:	34 f4       	brge	.+12     	; 0x2d0 <new_mole+0x3a>
- 2c4:	89 2b       	or	r24, r25
- 2c6:	b1 f4       	brne	.+44     	; 0x2f4 <new_mole+0x5e>
+ 38a:	81 30       	cpi	r24, 0x01	; 1
+ 38c:	91 05       	cpc	r25, r1
+ 38e:	81 f0       	breq	.+32     	; 0x3b0 <new_mole+0x4c>
+ 390:	34 f4       	brge	.+12     	; 0x39e <new_mole+0x3a>
+ 392:	89 2b       	or	r24, r25
+ 394:	b1 f4       	brne	.+44     	; 0x3c2 <new_mole+0x5e>
     case 0:
         led |= (1<<MOLE0);
- 2c8:	80 91 20 01 	lds	r24, 0x0120
- 2cc:	80 68       	ori	r24, 0x80	; 128
- 2ce:	10 c0       	rjmp	.+32     	; 0x2f0 <new_mole+0x5a>
+ 396:	80 91 20 01 	lds	r24, 0x0120
+ 39a:	80 68       	ori	r24, 0x80	; 128
+ 39c:	10 c0       	rjmp	.+32     	; 0x3be <new_mole+0x5a>
 void new_mole(int new)
 {
     mole_status[new] = 1;
     mole_living_times[new] = next_mole_living_times;
 
     switch(new){
- 2d0:	82 30       	cpi	r24, 0x02	; 2
- 2d2:	91 05       	cpc	r25, r1
- 2d4:	51 f0       	breq	.+20     	; 0x2ea <new_mole+0x54>
- 2d6:	03 97       	sbiw	r24, 0x03	; 3
- 2d8:	69 f4       	brne	.+26     	; 0x2f4 <new_mole+0x5e>
+ 39e:	82 30       	cpi	r24, 0x02	; 2
+ 3a0:	91 05       	cpc	r25, r1
+ 3a2:	51 f0       	breq	.+20     	; 0x3b8 <new_mole+0x54>
+ 3a4:	03 97       	sbiw	r24, 0x03	; 3
+ 3a6:	69 f4       	brne	.+26     	; 0x3c2 <new_mole+0x5e>
         break;
     case 2:
         led |= (1<<MOLE2);
         break;
     case 3:
         led |= (1<<MOLE3);
- 2da:	80 91 20 01 	lds	r24, 0x0120
- 2de:	80 61       	ori	r24, 0x10	; 16
- 2e0:	07 c0       	rjmp	.+14     	; 0x2f0 <new_mole+0x5a>
+ 3a8:	80 91 20 01 	lds	r24, 0x0120
+ 3ac:	80 61       	ori	r24, 0x10	; 16
+ 3ae:	07 c0       	rjmp	.+14     	; 0x3be <new_mole+0x5a>
     switch(new){
     case 0:
         led |= (1<<MOLE0);
         break;
     case 1:
         led |= (1<<MOLE1);
- 2e2:	80 91 20 01 	lds	r24, 0x0120
- 2e6:	80 64       	ori	r24, 0x40	; 64
- 2e8:	03 c0       	rjmp	.+6      	; 0x2f0 <new_mole+0x5a>
+ 3b0:	80 91 20 01 	lds	r24, 0x0120
+ 3b4:	80 64       	ori	r24, 0x40	; 64
+ 3b6:	03 c0       	rjmp	.+6      	; 0x3be <new_mole+0x5a>
         break;
     case 2:
         led |= (1<<MOLE2);
- 2ea:	80 91 20 01 	lds	r24, 0x0120
- 2ee:	80 62       	ori	r24, 0x20	; 32
+ 3b8:	80 91 20 01 	lds	r24, 0x0120
+ 3bc:	80 62       	ori	r24, 0x20	; 32
         break;
     case 3:
         led |= (1<<MOLE3);
- 2f0:	80 93 20 01 	sts	0x0120, r24
+ 3be:	80 93 20 01 	sts	0x0120, r24
         break;
     default:
         break;
     }
 
     PORT_MOLE = led;
- 2f4:	80 91 20 01 	lds	r24, 0x0120
- 2f8:	85 b9       	out	0x05, r24	; 5
- 2fa:	08 95       	ret
+ 3c2:	80 91 20 01 	lds	r24, 0x0120
+ 3c6:	85 b9       	out	0x05, r24	; 5
+ 3c8:	08 95       	ret
 
-000002fc <shutdown_mole>:
+000003ca <shutdown_mole>:
 }
 
 /* Kill old mole that over its living time */
 void shutdown_mole(int mole_number)
 {
     switch(mole_number){
- 2fc:	81 30       	cpi	r24, 0x01	; 1
- 2fe:	91 05       	cpc	r25, r1
- 300:	89 f0       	breq	.+34     	; 0x324 <shutdown_mole+0x28>
- 302:	34 f4       	brge	.+12     	; 0x310 <shutdown_mole+0x14>
- 304:	00 97       	sbiw	r24, 0x00	; 0
- 306:	b9 f4       	brne	.+46     	; 0x336 <shutdown_mole+0x3a>
+ 3ca:	81 30       	cpi	r24, 0x01	; 1
+ 3cc:	91 05       	cpc	r25, r1
+ 3ce:	89 f0       	breq	.+34     	; 0x3f2 <shutdown_mole+0x28>
+ 3d0:	34 f4       	brge	.+12     	; 0x3de <shutdown_mole+0x14>
+ 3d2:	00 97       	sbiw	r24, 0x00	; 0
+ 3d4:	b9 f4       	brne	.+46     	; 0x404 <shutdown_mole+0x3a>
     case 0:
         led &= ~((1<<MOLE0) & 0xff);
- 308:	20 91 20 01 	lds	r18, 0x0120
- 30c:	2f 77       	andi	r18, 0x7F	; 127
- 30e:	11 c0       	rjmp	.+34     	; 0x332 <shutdown_mole+0x36>
+ 3d6:	20 91 20 01 	lds	r18, 0x0120
+ 3da:	2f 77       	andi	r18, 0x7F	; 127
+ 3dc:	11 c0       	rjmp	.+34     	; 0x400 <shutdown_mole+0x36>
 }
 
 /* Kill old mole that over its living time */
 void shutdown_mole(int mole_number)
 {
     switch(mole_number){
- 310:	82 30       	cpi	r24, 0x02	; 2
- 312:	91 05       	cpc	r25, r1
- 314:	59 f0       	breq	.+22     	; 0x32c <shutdown_mole+0x30>
- 316:	83 30       	cpi	r24, 0x03	; 3
- 318:	91 05       	cpc	r25, r1
- 31a:	69 f4       	brne	.+26     	; 0x336 <shutdown_mole+0x3a>
+ 3de:	82 30       	cpi	r24, 0x02	; 2
+ 3e0:	91 05       	cpc	r25, r1
+ 3e2:	59 f0       	breq	.+22     	; 0x3fa <shutdown_mole+0x30>
+ 3e4:	83 30       	cpi	r24, 0x03	; 3
+ 3e6:	91 05       	cpc	r25, r1
+ 3e8:	69 f4       	brne	.+26     	; 0x404 <shutdown_mole+0x3a>
         break;
     case 2:
         led &= ~((1<<MOLE2) & 0xff);
         break;
     case 3:
         led &= ~((1<<MOLE3) & 0xff);
- 31c:	20 91 20 01 	lds	r18, 0x0120
- 320:	2f 7e       	andi	r18, 0xEF	; 239
- 322:	07 c0       	rjmp	.+14     	; 0x332 <shutdown_mole+0x36>
+ 3ea:	20 91 20 01 	lds	r18, 0x0120
+ 3ee:	2f 7e       	andi	r18, 0xEF	; 239
+ 3f0:	07 c0       	rjmp	.+14     	; 0x400 <shutdown_mole+0x36>
     switch(mole_number){
     case 0:
         led &= ~((1<<MOLE0) & 0xff);
         break;
     case 1:
         led &= ~((1<<MOLE1) & 0xff);
- 324:	20 91 20 01 	lds	r18, 0x0120
- 328:	2f 7b       	andi	r18, 0xBF	; 191
- 32a:	03 c0       	rjmp	.+6      	; 0x332 <shutdown_mole+0x36>
+ 3f2:	20 91 20 01 	lds	r18, 0x0120
+ 3f6:	2f 7b       	andi	r18, 0xBF	; 191
+ 3f8:	03 c0       	rjmp	.+6      	; 0x400 <shutdown_mole+0x36>
         break;
     case 2:
         led &= ~((1<<MOLE2) & 0xff);
- 32c:	20 91 20 01 	lds	r18, 0x0120
- 330:	2f 7d       	andi	r18, 0xDF	; 223
+ 3fa:	20 91 20 01 	lds	r18, 0x0120
+ 3fe:	2f 7d       	andi	r18, 0xDF	; 223
         break;
     case 3:
         led &= ~((1<<MOLE3) & 0xff);
- 332:	20 93 20 01 	sts	0x0120, r18
+ 400:	20 93 20 01 	sts	0x0120, r18
         break;
     }
 
     missed++;
- 336:	20 91 1c 01 	lds	r18, 0x011C
- 33a:	30 91 1d 01 	lds	r19, 0x011D
- 33e:	2f 5f       	subi	r18, 0xFF	; 255
- 340:	3f 4f       	sbci	r19, 0xFF	; 255
- 342:	30 93 1d 01 	sts	0x011D, r19
- 346:	20 93 1c 01 	sts	0x011C, r18
+ 404:	20 91 1c 01 	lds	r18, 0x011C
+ 408:	30 91 1d 01 	lds	r19, 0x011D
+ 40c:	2f 5f       	subi	r18, 0xFF	; 255
+ 40e:	3f 4f       	sbci	r19, 0xFF	; 255
+ 410:	30 93 1d 01 	sts	0x011D, r19
+ 414:	20 93 1c 01 	sts	0x011C, r18
     mole_status[mole_number] = 0;
- 34a:	88 0f       	add	r24, r24
- 34c:	99 1f       	adc	r25, r25
- 34e:	fc 01       	movw	r30, r24
- 350:	ec 5e       	subi	r30, 0xEC	; 236
- 352:	fe 4f       	sbci	r31, 0xFE	; 254
- 354:	11 82       	std	Z+1, r1	; 0x01
- 356:	10 82       	st	Z, r1
+ 418:	88 0f       	add	r24, r24
+ 41a:	99 1f       	adc	r25, r25
+ 41c:	fc 01       	movw	r30, r24
+ 41e:	ec 5e       	subi	r30, 0xEC	; 236
+ 420:	fe 4f       	sbci	r31, 0xFE	; 254
+ 422:	11 82       	std	Z+1, r1	; 0x01
+ 424:	10 82       	st	Z, r1
     PORT_MOLE = led;
- 358:	80 91 20 01 	lds	r24, 0x0120
- 35c:	85 b9       	out	0x05, r24	; 5
- 35e:	08 95       	ret
+ 426:	80 91 20 01 	lds	r24, 0x0120
+ 42a:	85 b9       	out	0x05, r24	; 5
+ 42c:	08 95       	ret
 
-00000360 <level_up>:
+0000042e <level_up>:
 }
 
 /* Increase difficulty */
-void level_up(int level)
+void level_up(void)
 {
     switch(level){
- 360:	83 30       	cpi	r24, 0x03	; 3
- 362:	91 05       	cpc	r25, r1
- 364:	b1 f0       	breq	.+44     	; 0x392 <level_up+0x32>
- 366:	3c f4       	brge	.+14     	; 0x376 <level_up+0x16>
- 368:	81 30       	cpi	r24, 0x01	; 1
- 36a:	91 05       	cpc	r25, r1
- 36c:	59 f0       	breq	.+22     	; 0x384 <level_up+0x24>
- 36e:	02 97       	sbiw	r24, 0x02	; 2
- 370:	a1 f4       	brne	.+40     	; 0x39a <level_up+0x3a>
+ 42e:	80 91 12 01 	lds	r24, 0x0112
+ 432:	90 91 13 01 	lds	r25, 0x0113
+ 436:	83 30       	cpi	r24, 0x03	; 3
+ 438:	91 05       	cpc	r25, r1
+ 43a:	b1 f0       	breq	.+44     	; 0x468 <level_up+0x3a>
+ 43c:	38 f4       	brcc	.+14     	; 0x44c <level_up+0x1e>
+ 43e:	81 30       	cpi	r24, 0x01	; 1
+ 440:	91 05       	cpc	r25, r1
+ 442:	59 f0       	breq	.+22     	; 0x45a <level_up+0x2c>
+ 444:	02 97       	sbiw	r24, 0x02	; 2
+ 446:	a1 f4       	brne	.+40     	; 0x470 <level_up+0x42>
     case 1:
         LEVEL_PORT_C |= (1<<PORT6);
         break;
     case 2:
         LEVEL_PORT_C &= ~((1<<PORT6) & 0xff);
- 372:	46 98       	cbi	0x08, 6	; 8
- 374:	11 c0       	rjmp	.+34     	; 0x398 <level_up+0x38>
+ 448:	46 98       	cbi	0x08, 6	; 8
+ 44a:	11 c0       	rjmp	.+34     	; 0x46e <level_up+0x40>
 }
 
 /* Increase difficulty */
-void level_up(int level)
+void level_up(void)
 {
     switch(level){
- 376:	85 30       	cpi	r24, 0x05	; 5
- 378:	91 05       	cpc	r25, r1
- 37a:	59 f0       	breq	.+22     	; 0x392 <level_up+0x32>
- 37c:	2c f0       	brlt	.+10     	; 0x388 <level_up+0x28>
- 37e:	06 97       	sbiw	r24, 0x06	; 6
- 380:	59 f0       	breq	.+22     	; 0x398 <level_up+0x38>
- 382:	0b c0       	rjmp	.+22     	; 0x39a <level_up+0x3a>
+ 44c:	85 30       	cpi	r24, 0x05	; 5
+ 44e:	91 05       	cpc	r25, r1
+ 450:	59 f0       	breq	.+22     	; 0x468 <level_up+0x3a>
+ 452:	28 f0       	brcs	.+10     	; 0x45e <level_up+0x30>
+ 454:	06 97       	sbiw	r24, 0x06	; 6
+ 456:	59 f0       	breq	.+22     	; 0x46e <level_up+0x40>
+ 458:	0b c0       	rjmp	.+22     	; 0x470 <level_up+0x42>
     case 1:
         LEVEL_PORT_C |= (1<<PORT6);
- 384:	46 9a       	sbi	0x08, 6	; 8
+ 45a:	46 9a       	sbi	0x08, 6	; 8
         break;
- 386:	09 c0       	rjmp	.+18     	; 0x39a <level_up+0x3a>
+ 45c:	09 c0       	rjmp	.+18     	; 0x470 <level_up+0x42>
     case 3:
         LEVEL_PORT_C &= ~((1<<PORT7) & 0xff);
-        LEVEL_PORT_E |= (1<<PORT7);
+        LEVEL_PORT_E |= (1<<PORT6);
         break;
     case 4:
-        LEVEL_PORT_E &= ~((1<<PORT7) & 0xff);
- 388:	77 98       	cbi	0x0e, 7	; 14
+        LEVEL_PORT_E &= ~((1<<PORT6) & 0xff);
+ 45e:	76 98       	cbi	0x0e, 6	; 14
         LEVEL_PORT_C |= (1<<PORT6) | (1<<PORT7);
- 38a:	88 b1       	in	r24, 0x08	; 8
- 38c:	80 6c       	ori	r24, 0xC0	; 192
- 38e:	88 b9       	out	0x08, r24	; 8
+ 460:	88 b1       	in	r24, 0x08	; 8
+ 462:	80 6c       	ori	r24, 0xC0	; 192
+ 464:	88 b9       	out	0x08, r24	; 8
         break;
- 390:	04 c0       	rjmp	.+8      	; 0x39a <level_up+0x3a>
+ 466:	04 c0       	rjmp	.+8      	; 0x470 <level_up+0x42>
     case 5:
         LEVEL_PORT_C &= ~((1<<PORT7) & 0xff);
- 392:	47 98       	cbi	0x08, 7	; 8
-        LEVEL_PORT_E |= (1<<PORT7);
- 394:	77 9a       	sbi	0x0e, 7	; 14
+ 468:	47 98       	cbi	0x08, 7	; 8
+        LEVEL_PORT_E |= (1<<PORT6);
+ 46a:	76 9a       	sbi	0x0e, 6	; 14
         break;
- 396:	01 c0       	rjmp	.+2      	; 0x39a <level_up+0x3a>
+ 46c:	01 c0       	rjmp	.+2      	; 0x470 <level_up+0x42>
     case 6:
         LEVEL_PORT_C |= (1<<PORT7);
- 398:	47 9a       	sbi	0x08, 7	; 8
+ 46e:	47 9a       	sbi	0x08, 7	; 8
+        break;
+    default:
         break;
     }
 
     level++;
+ 470:	80 91 12 01 	lds	r24, 0x0112
+ 474:	90 91 13 01 	lds	r25, 0x0113
+ 478:	01 96       	adiw	r24, 0x01	; 1
+ 47a:	90 93 13 01 	sts	0x0113, r25
+ 47e:	80 93 12 01 	sts	0x0112, r24
 
     next_mole_set_delay -= 200;
- 39a:	80 91 0e 01 	lds	r24, 0x010E
- 39e:	90 91 0f 01 	lds	r25, 0x010F
- 3a2:	88 5c       	subi	r24, 0xC8	; 200
- 3a4:	91 09       	sbc	r25, r1
- 3a6:	90 93 0f 01 	sts	0x010F, r25
- 3aa:	80 93 0e 01 	sts	0x010E, r24
+ 482:	80 91 0e 01 	lds	r24, 0x010E
+ 486:	90 91 0f 01 	lds	r25, 0x010F
+ 48a:	88 5c       	subi	r24, 0xC8	; 200
+ 48c:	91 09       	sbc	r25, r1
+ 48e:	90 93 0f 01 	sts	0x010F, r25
+ 492:	80 93 0e 01 	sts	0x010E, r24
     next_mole_living_times -= 200;
- 3ae:	80 91 10 01 	lds	r24, 0x0110
- 3b2:	90 91 11 01 	lds	r25, 0x0111
- 3b6:	88 5c       	subi	r24, 0xC8	; 200
- 3b8:	91 09       	sbc	r25, r1
- 3ba:	90 93 11 01 	sts	0x0111, r25
- 3be:	80 93 10 01 	sts	0x0110, r24
- 3c2:	08 95       	ret
+ 496:	80 91 10 01 	lds	r24, 0x0110
+ 49a:	90 91 11 01 	lds	r25, 0x0111
+ 49e:	88 5c       	subi	r24, 0xC8	; 200
+ 4a0:	91 09       	sbc	r25, r1
+ 4a2:	90 93 11 01 	sts	0x0111, r25
+ 4a6:	80 93 10 01 	sts	0x0110, r24
+ 4aa:	08 95       	ret
 
-000003c4 <main>:
+000004ac <main>:
 }
 
 int main(void)
 {
     /* Lock Interrupt */
     cli();
- 3c4:	f8 94       	cli
+ 4ac:	f8 94       	cli
 
     int i, new;
 
     DDR_MOLE = 0xff;
- 3c6:	8f ef       	ldi	r24, 0xFF	; 255
- 3c8:	84 b9       	out	0x04, r24	; 4
+ 4ae:	8f ef       	ldi	r24, 0xFF	; 255
+ 4b0:	84 b9       	out	0x04, r24	; 4
     PORT_MOLE = 0x00;
- 3ca:	15 b8       	out	0x05, r1	; 5
+ 4b2:	15 b8       	out	0x05, r1	; 5
 
     DDR_LEVEL_PORT_C |= (1<<PORT6) | (1<<PORT7);    //PC6 : Green, PC7 : Yellow
- 3cc:	87 b1       	in	r24, 0x07	; 7
- 3ce:	80 6c       	ori	r24, 0xC0	; 192
- 3d0:	87 b9       	out	0x07, r24	; 7
-    DDR_LEVEL_PORT_E |= (1<<PORT7);                 //PE7 : Red
- 3d2:	6f 9a       	sbi	0x0d, 7	; 13
+ 4b4:	87 b1       	in	r24, 0x07	; 7
+ 4b6:	80 6c       	ori	r24, 0xC0	; 192
+ 4b8:	87 b9       	out	0x07, r24	; 7
+    DDR_LEVEL_PORT_E |= (1<<PORT6);                 //PE7 : Red
+ 4ba:	6e 9a       	sbi	0x0d, 6	; 13
     LEVEL_PORT_C = 0x00;
- 3d4:	18 b8       	out	0x08, r1	; 8
+ 4bc:	18 b8       	out	0x08, r1	; 8
     LEVEL_PORT_E = 0x00;
- 3d6:	1e b8       	out	0x0e, r1	; 14
+ 4be:	1e b8       	out	0x0e, r1	; 14
+
+    DDRD |= (1<<BUZZER);                            //Buzzer port setting : PD6
+ 4c0:	56 9a       	sbi	0x0a, 6	; 10
 
     init_interrupt();
- 3d8:	85 de       	rcall	.-758    	; 0xe4 <init_interrupt>
- 3da:	78 94       	sei
+ 4c2:	10 de       	rcall	.-992    	; 0xe4 <init_interrupt>
+ 4c4:	78 94       	sei
 
     sei();
- 3dc:	88 eb       	ldi	r24, 0xB8	; 184
+ 4c6:	88 eb       	ldi	r24, 0xB8	; 184
     /*Unlock Interrupt */
 
 
 
     /* Start Motion is not implemented, replaced to delay function */
     delay(3000);
- 3de:	9b e0       	ldi	r25, 0x0B	; 11
- 3e0:	4e df       	rcall	.-356    	; 0x27e <delay>
- 3e2:	e0 d0       	rcall	.+448    	; 0x5a4 <rand>
- 3e4:	64 e0       	ldi	r22, 0x04	; 4
+ 4c8:	9b e0       	ldi	r25, 0x0B	; 11
+ 4ca:	35 de       	rcall	.-918    	; 0x136 <delay>
+ 4cc:	dc d0       	rcall	.+440    	; 0x686 <rand>
+ 4ce:	64 e0       	ldi	r22, 0x04	; 4
 
     /* Set start mole and show */
     new_mole(rand() % 4);
- 3e6:	70 e0       	ldi	r23, 0x00	; 0
- 3e8:	83 d0       	rcall	.+262    	; 0x4f0 <__divmodhi4>
- 3ea:	55 df       	rcall	.-342    	; 0x296 <new_mole>
- 3ec:	04 e1       	ldi	r16, 0x14	; 20
- 3ee:	10 e0       	ldi	r17, 0x00	; 0
- 3f0:	81 e0       	ldi	r24, 0x01	; 1
- 3f2:	90 e0       	ldi	r25, 0x00	; 0
- 3f4:	44 df       	rcall	.-376    	; 0x27e <delay>
+ 4d0:	70 e0       	ldi	r23, 0x00	; 0
+ 4d2:	7f d0       	rcall	.+254    	; 0x5d2 <__divmodhi4>
+ 4d4:	47 df       	rcall	.-370    	; 0x364 <new_mole>
+ 4d6:	04 e1       	ldi	r16, 0x14	; 20
+ 4d8:	10 e0       	ldi	r17, 0x00	; 0
+ 4da:	81 e0       	ldi	r24, 0x01	; 1
+ 4dc:	90 e0       	ldi	r25, 0x00	; 0
+ 4de:	2b de       	rcall	.-938    	; 0x136 <delay>
 
             new_mole_delay = next_mole_set_delay;
         }
 
         /* Level Up : Level 0 to 6*/
         if( catched > 0 && catched % 20 == 0 && catched <= 140)
- 3f6:	c0 e0       	ldi	r28, 0x00	; 0
- 3f8:	d0 e0       	ldi	r29, 0x00	; 0
+ 4e0:	c0 e0       	ldi	r28, 0x00	; 0
+ 4e2:	d0 e0       	ldi	r29, 0x00	; 0
     new_mole(rand() % 4);
 
     while(1)
     {
         /* Global delay 1ms */
         delay(1);
- 3fa:	fe 01       	movw	r30, r28
- 3fc:	ee 0f       	add	r30, r30
- 3fe:	ff 1f       	adc	r31, r31
- 400:	df 01       	movw	r26, r30
+ 4e4:	fe 01       	movw	r30, r28
+ 4e6:	ee 0f       	add	r30, r30
+ 4e8:	ff 1f       	adc	r31, r31
+ 4ea:	df 01       	movw	r26, r30
         
         for(i=0;i<4;i++)
- 402:	ac 5e       	subi	r26, 0xEC	; 236
- 404:	be 4f       	sbci	r27, 0xFE	; 254
+ 4ec:	ac 5e       	subi	r26, 0xEC	; 236
+ 4ee:	be 4f       	sbci	r27, 0xFE	; 254
         {
             /* If current position's mole is live */
             if( mole_status[i] ){
- 406:	8d 91       	ld	r24, X+
- 408:	9c 91       	ld	r25, X
- 40a:	89 2b       	or	r24, r25
- 40c:	69 f0       	breq	.+26     	; 0x428 <main+0x64>
- 40e:	ea 5f       	subi	r30, 0xFA	; 250
- 410:	fe 4f       	sbci	r31, 0xFE	; 254
- 412:	80 81       	ld	r24, Z
- 414:	91 81       	ldd	r25, Z+1	; 0x01
- 416:	01 97       	sbiw	r24, 0x01	; 1
- 418:	91 83       	std	Z+1, r25	; 0x01
+ 4f0:	8d 91       	ld	r24, X+
+ 4f2:	9c 91       	ld	r25, X
+ 4f4:	89 2b       	or	r24, r25
+ 4f6:	69 f0       	breq	.+26     	; 0x512 <main+0x66>
+ 4f8:	ea 5f       	subi	r30, 0xFA	; 250
+ 4fa:	fe 4f       	sbci	r31, 0xFE	; 254
+ 4fc:	80 81       	ld	r24, Z
+ 4fe:	91 81       	ldd	r25, Z+1	; 0x01
+ 500:	01 97       	sbiw	r24, 0x01	; 1
+ 502:	91 83       	std	Z+1, r25	; 0x01
                 mole_living_times[i]--;
- 41a:	80 83       	st	Z, r24
- 41c:	80 81       	ld	r24, Z
- 41e:	91 81       	ldd	r25, Z+1	; 0x01
- 420:	89 2b       	or	r24, r25
- 422:	11 f4       	brne	.+4      	; 0x428 <main+0x64>
- 424:	ce 01       	movw	r24, r28
- 426:	6a df       	rcall	.-300    	; 0x2fc <shutdown_mole>
+ 504:	80 83       	st	Z, r24
+ 506:	80 81       	ld	r24, Z
+ 508:	91 81       	ldd	r25, Z+1	; 0x01
+ 50a:	89 2b       	or	r24, r25
+ 50c:	11 f4       	brne	.+4      	; 0x512 <main+0x66>
+ 50e:	ce 01       	movw	r24, r28
+ 510:	5c df       	rcall	.-328    	; 0x3ca <shutdown_mole>
                 if( !mole_living_times[i] ) shutdown_mole(i);       //Living time over : shutdown mole
- 428:	21 96       	adiw	r28, 0x01	; 1
- 42a:	c4 30       	cpi	r28, 0x04	; 4
- 42c:	d1 05       	cpc	r29, r1
- 42e:	29 f7       	brne	.-54     	; 0x3fa <main+0x36>
- 430:	80 91 04 01 	lds	r24, 0x0104
- 434:	90 91 05 01 	lds	r25, 0x0105
+ 512:	21 96       	adiw	r28, 0x01	; 1
+ 514:	c4 30       	cpi	r28, 0x04	; 4
+ 516:	d1 05       	cpc	r29, r1
+ 518:	29 f7       	brne	.-54     	; 0x4e4 <main+0x38>
+ 51a:	80 91 04 01 	lds	r24, 0x0104
+ 51e:	90 91 05 01 	lds	r25, 0x0105
     while(1)
     {
         /* Global delay 1ms */
         delay(1);
         
         for(i=0;i<4;i++)
- 438:	01 97       	sbiw	r24, 0x01	; 1
- 43a:	90 93 05 01 	sts	0x0105, r25
+ 522:	01 97       	sbiw	r24, 0x01	; 1
+ 524:	90 93 05 01 	sts	0x0105, r25
                 mole_living_times[i]--;
                 if( !mole_living_times[i] ) shutdown_mole(i);       //Living time over : shutdown mole
             }
         }
 
         new_mole_delay--;
- 43e:	80 93 04 01 	sts	0x0104, r24
- 442:	80 91 04 01 	lds	r24, 0x0104
- 446:	90 91 05 01 	lds	r25, 0x0105
- 44a:	89 2b       	or	r24, r25
- 44c:	a9 f4       	brne	.+42     	; 0x478 <main+0xb4>
- 44e:	aa d0       	rcall	.+340    	; 0x5a4 <rand>
+ 528:	80 93 04 01 	sts	0x0104, r24
+ 52c:	80 91 04 01 	lds	r24, 0x0104
+ 530:	90 91 05 01 	lds	r25, 0x0105
+ 534:	89 2b       	or	r24, r25
+ 536:	a9 f4       	brne	.+42     	; 0x562 <main+0xb6>
+ 538:	a6 d0       	rcall	.+332    	; 0x686 <rand>
 
         /* If delay time is over */
         if( !new_mole_delay )
- 450:	be 01       	movw	r22, r28
- 452:	4e d0       	rcall	.+156    	; 0x4f0 <__divmodhi4>
- 454:	fc 01       	movw	r30, r24
- 456:	ee 0f       	add	r30, r30
- 458:	ff 1f       	adc	r31, r31
- 45a:	ec 5e       	subi	r30, 0xEC	; 236
+ 53a:	be 01       	movw	r22, r28
+ 53c:	4a d0       	rcall	.+148    	; 0x5d2 <__divmodhi4>
+ 53e:	fc 01       	movw	r30, r24
+ 540:	ee 0f       	add	r30, r30
+ 542:	ff 1f       	adc	r31, r31
+ 544:	ec 5e       	subi	r30, 0xEC	; 236
         {
             new = rand() % 4;
- 45c:	fe 4f       	sbci	r31, 0xFE	; 254
- 45e:	20 81       	ld	r18, Z
- 460:	31 81       	ldd	r19, Z+1	; 0x01
- 462:	23 2b       	or	r18, r19
- 464:	09 f4       	brne	.+2      	; 0x468 <main+0xa4>
+ 546:	fe 4f       	sbci	r31, 0xFE	; 254
+ 548:	20 81       	ld	r18, Z
+ 54a:	31 81       	ldd	r19, Z+1	; 0x01
+ 54c:	23 2b       	or	r18, r19
+ 54e:	09 f4       	brne	.+2      	; 0x552 <main+0xa6>
             
             if( !mole_status[new] ) new_mole(new);
- 466:	17 df       	rcall	.-466    	; 0x296 <new_mole>
- 468:	80 91 0e 01 	lds	r24, 0x010E
- 46c:	90 91 0f 01 	lds	r25, 0x010F
- 470:	90 93 05 01 	sts	0x0105, r25
- 474:	80 93 04 01 	sts	0x0104, r24
- 478:	80 91 1e 01 	lds	r24, 0x011E
+ 550:	09 df       	rcall	.-494    	; 0x364 <new_mole>
+ 552:	80 91 0e 01 	lds	r24, 0x010E
+ 556:	90 91 0f 01 	lds	r25, 0x010F
+ 55a:	90 93 05 01 	sts	0x0105, r25
+ 55e:	80 93 04 01 	sts	0x0104, r24
+ 562:	80 91 1e 01 	lds	r24, 0x011E
 
             new_mole_delay = next_mole_set_delay;
- 47c:	90 91 1f 01 	lds	r25, 0x011F
- 480:	89 2b       	or	r24, r25
- 482:	e9 f0       	breq	.+58     	; 0x4be <main+0xfa>
- 484:	80 91 1e 01 	lds	r24, 0x011E
- 488:	90 91 1f 01 	lds	r25, 0x011F
+ 566:	90 91 1f 01 	lds	r25, 0x011F
+ 56a:	89 2b       	or	r24, r25
+ 56c:	c9 f0       	breq	.+50     	; 0x5a0 <main+0xf4>
+ 56e:	80 91 1e 01 	lds	r24, 0x011E
+ 572:	90 91 1f 01 	lds	r25, 0x011F
         }
 
         /* Level Up : Level 0 to 6*/
         if( catched > 0 && catched % 20 == 0 && catched <= 140)
- 48c:	b8 01       	movw	r22, r16
- 48e:	1c d0       	rcall	.+56     	; 0x4c8 <__udivmodhi4>
- 490:	89 2b       	or	r24, r25
- 492:	a9 f4       	brne	.+42     	; 0x4be <main+0xfa>
- 494:	80 91 1e 01 	lds	r24, 0x011E
- 498:	90 91 1f 01 	lds	r25, 0x011F
- 49c:	8d 38       	cpi	r24, 0x8D	; 141
- 49e:	91 05       	cpc	r25, r1
- 4a0:	70 f4       	brcc	.+28     	; 0x4be <main+0xfa>
- 4a2:	80 91 1e 01 	lds	r24, 0x011E
- 4a6:	90 91 1f 01 	lds	r25, 0x011F
- 4aa:	01 96       	adiw	r24, 0x01	; 1
- 4ac:	90 93 1f 01 	sts	0x011F, r25
- 4b0:	80 93 1e 01 	sts	0x011E, r24
- 4b4:	80 91 12 01 	lds	r24, 0x0112
+ 576:	b8 01       	movw	r22, r16
+ 578:	18 d0       	rcall	.+48     	; 0x5aa <__udivmodhi4>
+ 57a:	89 2b       	or	r24, r25
+ 57c:	89 f4       	brne	.+34     	; 0x5a0 <main+0xf4>
+ 57e:	80 91 1e 01 	lds	r24, 0x011E
+ 582:	90 91 1f 01 	lds	r25, 0x011F
+ 586:	8d 38       	cpi	r24, 0x8D	; 141
+ 588:	91 05       	cpc	r25, r1
+ 58a:	50 f4       	brcc	.+20     	; 0x5a0 <main+0xf4>
+ 58c:	80 91 1e 01 	lds	r24, 0x011E
+ 590:	90 91 1f 01 	lds	r25, 0x011F
+ 594:	01 96       	adiw	r24, 0x01	; 1
+ 596:	90 93 1f 01 	sts	0x011F, r25
+ 59a:	80 93 1e 01 	sts	0x011E, r24
+ 59e:	47 df       	rcall	.-370    	; 0x42e <level_up>
+ 5a0:	80 91 1c 01 	lds	r24, 0x011C
         {
             catched++;
- 4b8:	90 91 13 01 	lds	r25, 0x0113
- 4bc:	51 df       	rcall	.-350    	; 0x360 <level_up>
- 4be:	80 91 1c 01 	lds	r24, 0x011C
- 4c2:	90 91 1d 01 	lds	r25, 0x011D
- 4c6:	94 cf       	rjmp	.-216    	; 0x3f0 <main+0x2c>
+ 5a4:	90 91 1d 01 	lds	r25, 0x011D
+ 5a8:	98 cf       	rjmp	.-208    	; 0x4da <main+0x2e>
 
-000004c8 <__udivmodhi4>:
- 4c8:	aa 1b       	sub	r26, r26
-            level_up(level);
- 4ca:	bb 1b       	sub	r27, r27
- 4cc:	51 e1       	ldi	r21, 0x11	; 17
- 4ce:	07 c0       	rjmp	.+14     	; 0x4de <__udivmodhi4_ep>
+000005aa <__udivmodhi4>:
+ 5aa:	aa 1b       	sub	r26, r26
+ 5ac:	bb 1b       	sub	r27, r27
+ 5ae:	51 e1       	ldi	r21, 0x11	; 17
+ 5b0:	07 c0       	rjmp	.+14     	; 0x5c0 <__udivmodhi4_ep>
 
-000004d0 <__udivmodhi4_loop>:
- 4d0:	aa 1f       	adc	r26, r26
- 4d2:	bb 1f       	adc	r27, r27
- 4d4:	a6 17       	cp	r26, r22
+000005b2 <__udivmodhi4_loop>:
+ 5b2:	aa 1f       	adc	r26, r26
+            level_up();
+ 5b4:	bb 1f       	adc	r27, r27
+ 5b6:	a6 17       	cp	r26, r22
         }
 
         if( missed >= 15)
- 4d6:	b7 07       	cpc	r27, r23
- 4d8:	10 f0       	brcs	.+4      	; 0x4de <__udivmodhi4_ep>
- 4da:	a6 1b       	sub	r26, r22
- 4dc:	b7 0b       	sbc	r27, r23
+ 5b8:	b7 07       	cpc	r27, r23
+ 5ba:	10 f0       	brcs	.+4      	; 0x5c0 <__udivmodhi4_ep>
+ 5bc:	a6 1b       	sub	r26, r22
+ 5be:	b7 0b       	sbc	r27, r23
 
-000004de <__udivmodhi4_ep>:
- 4de:	88 1f       	adc	r24, r24
- 4e0:	99 1f       	adc	r25, r25
- 4e2:	5a 95       	dec	r21
- 4e4:	a9 f7       	brne	.-22     	; 0x4d0 <__udivmodhi4_loop>
- 4e6:	80 95       	com	r24
- 4e8:	90 95       	com	r25
- 4ea:	bc 01       	movw	r22, r24
- 4ec:	cd 01       	movw	r24, r26
- 4ee:	08 95       	ret
+000005c0 <__udivmodhi4_ep>:
+ 5c0:	88 1f       	adc	r24, r24
+ 5c2:	99 1f       	adc	r25, r25
+ 5c4:	5a 95       	dec	r21
+ 5c6:	a9 f7       	brne	.-22     	; 0x5b2 <__udivmodhi4_loop>
+ 5c8:	80 95       	com	r24
+ 5ca:	90 95       	com	r25
+ 5cc:	bc 01       	movw	r22, r24
+ 5ce:	cd 01       	movw	r24, r26
+ 5d0:	08 95       	ret
 
-000004f0 <__divmodhi4>:
- 4f0:	97 fb       	bst	r25, 7
- 4f2:	07 2e       	mov	r0, r23
- 4f4:	16 f4       	brtc	.+4      	; 0x4fa <__divmodhi4+0xa>
- 4f6:	00 94       	com	r0
- 4f8:	06 d0       	rcall	.+12     	; 0x506 <__divmodhi4_neg1>
- 4fa:	77 fd       	sbrc	r23, 7
- 4fc:	08 d0       	rcall	.+16     	; 0x50e <__divmodhi4_neg2>
- 4fe:	e4 df       	rcall	.-56     	; 0x4c8 <__udivmodhi4>
- 500:	07 fc       	sbrc	r0, 7
- 502:	05 d0       	rcall	.+10     	; 0x50e <__divmodhi4_neg2>
- 504:	3e f4       	brtc	.+14     	; 0x514 <__divmodhi4_exit>
+000005d2 <__divmodhi4>:
+ 5d2:	97 fb       	bst	r25, 7
+ 5d4:	07 2e       	mov	r0, r23
+ 5d6:	16 f4       	brtc	.+4      	; 0x5dc <__divmodhi4+0xa>
+ 5d8:	00 94       	com	r0
+ 5da:	06 d0       	rcall	.+12     	; 0x5e8 <__divmodhi4_neg1>
+ 5dc:	77 fd       	sbrc	r23, 7
+ 5de:	08 d0       	rcall	.+16     	; 0x5f0 <__divmodhi4_neg2>
+ 5e0:	e4 df       	rcall	.-56     	; 0x5aa <__udivmodhi4>
+ 5e2:	07 fc       	sbrc	r0, 7
+ 5e4:	05 d0       	rcall	.+10     	; 0x5f0 <__divmodhi4_neg2>
+ 5e6:	3e f4       	brtc	.+14     	; 0x5f6 <__divmodhi4_exit>
 
-00000506 <__divmodhi4_neg1>:
- 506:	90 95       	com	r25
- 508:	81 95       	neg	r24
- 50a:	9f 4f       	sbci	r25, 0xFF	; 255
- 50c:	08 95       	ret
-
-0000050e <__divmodhi4_neg2>:
- 50e:	70 95       	com	r23
- 510:	61 95       	neg	r22
- 512:	7f 4f       	sbci	r23, 0xFF	; 255
-
-00000514 <__divmodhi4_exit>:
- 514:	08 95       	ret
-
-00000516 <do_rand>:
- 516:	8f 92       	push	r8
- 518:	9f 92       	push	r9
- 51a:	af 92       	push	r10
- 51c:	bf 92       	push	r11
- 51e:	cf 92       	push	r12
- 520:	df 92       	push	r13
- 522:	ef 92       	push	r14
- 524:	ff 92       	push	r15
- 526:	cf 93       	push	r28
- 528:	df 93       	push	r29
- 52a:	ec 01       	movw	r28, r24
- 52c:	68 81       	ld	r22, Y
- 52e:	79 81       	ldd	r23, Y+1	; 0x01
- 530:	8a 81       	ldd	r24, Y+2	; 0x02
- 532:	9b 81       	ldd	r25, Y+3	; 0x03
- 534:	61 15       	cp	r22, r1
- 536:	71 05       	cpc	r23, r1
- 538:	81 05       	cpc	r24, r1
- 53a:	91 05       	cpc	r25, r1
- 53c:	21 f4       	brne	.+8      	; 0x546 <do_rand+0x30>
- 53e:	64 e2       	ldi	r22, 0x24	; 36
- 540:	79 ed       	ldi	r23, 0xD9	; 217
- 542:	8b e5       	ldi	r24, 0x5B	; 91
- 544:	97 e0       	ldi	r25, 0x07	; 7
- 546:	2d e1       	ldi	r18, 0x1D	; 29
- 548:	33 ef       	ldi	r19, 0xF3	; 243
- 54a:	41 e0       	ldi	r20, 0x01	; 1
- 54c:	50 e0       	ldi	r21, 0x00	; 0
- 54e:	38 d0       	rcall	.+112    	; 0x5c0 <__divmodsi4>
- 550:	49 01       	movw	r8, r18
- 552:	5a 01       	movw	r10, r20
- 554:	9b 01       	movw	r18, r22
- 556:	ac 01       	movw	r20, r24
- 558:	a7 ea       	ldi	r26, 0xA7	; 167
- 55a:	b1 e4       	ldi	r27, 0x41	; 65
- 55c:	4d d0       	rcall	.+154    	; 0x5f8 <__muluhisi3>
- 55e:	6b 01       	movw	r12, r22
- 560:	7c 01       	movw	r14, r24
- 562:	ac ee       	ldi	r26, 0xEC	; 236
- 564:	b4 ef       	ldi	r27, 0xF4	; 244
- 566:	a5 01       	movw	r20, r10
- 568:	94 01       	movw	r18, r8
- 56a:	52 d0       	rcall	.+164    	; 0x610 <__mulohisi3>
- 56c:	dc 01       	movw	r26, r24
- 56e:	cb 01       	movw	r24, r22
- 570:	8c 0d       	add	r24, r12
- 572:	9d 1d       	adc	r25, r13
- 574:	ae 1d       	adc	r26, r14
- 576:	bf 1d       	adc	r27, r15
- 578:	b7 ff       	sbrs	r27, 7
- 57a:	03 c0       	rjmp	.+6      	; 0x582 <do_rand+0x6c>
- 57c:	01 97       	sbiw	r24, 0x01	; 1
- 57e:	a1 09       	sbc	r26, r1
- 580:	b0 48       	sbci	r27, 0x80	; 128
- 582:	88 83       	st	Y, r24
- 584:	99 83       	std	Y+1, r25	; 0x01
- 586:	aa 83       	std	Y+2, r26	; 0x02
- 588:	bb 83       	std	Y+3, r27	; 0x03
- 58a:	9f 77       	andi	r25, 0x7F	; 127
- 58c:	df 91       	pop	r29
- 58e:	cf 91       	pop	r28
- 590:	ff 90       	pop	r15
- 592:	ef 90       	pop	r14
- 594:	df 90       	pop	r13
- 596:	cf 90       	pop	r12
- 598:	bf 90       	pop	r11
- 59a:	af 90       	pop	r10
- 59c:	9f 90       	pop	r9
- 59e:	8f 90       	pop	r8
- 5a0:	08 95       	ret
-
-000005a2 <rand_r>:
- 5a2:	b9 cf       	rjmp	.-142    	; 0x516 <do_rand>
-
-000005a4 <rand>:
- 5a4:	80 e0       	ldi	r24, 0x00	; 0
- 5a6:	91 e0       	ldi	r25, 0x01	; 1
- 5a8:	b6 cf       	rjmp	.-148    	; 0x516 <do_rand>
-
-000005aa <srand>:
- 5aa:	a0 e0       	ldi	r26, 0x00	; 0
- 5ac:	b0 e0       	ldi	r27, 0x00	; 0
- 5ae:	80 93 00 01 	sts	0x0100, r24
- 5b2:	90 93 01 01 	sts	0x0101, r25
- 5b6:	a0 93 02 01 	sts	0x0102, r26
- 5ba:	b0 93 03 01 	sts	0x0103, r27
- 5be:	08 95       	ret
-
-000005c0 <__divmodsi4>:
- 5c0:	05 2e       	mov	r0, r21
- 5c2:	97 fb       	bst	r25, 7
- 5c4:	16 f4       	brtc	.+4      	; 0x5ca <__divmodsi4+0xa>
- 5c6:	00 94       	com	r0
- 5c8:	0f d0       	rcall	.+30     	; 0x5e8 <__negsi2>
- 5ca:	57 fd       	sbrc	r21, 7
- 5cc:	05 d0       	rcall	.+10     	; 0x5d8 <__divmodsi4_neg2>
- 5ce:	24 d0       	rcall	.+72     	; 0x618 <__udivmodsi4>
- 5d0:	07 fc       	sbrc	r0, 7
- 5d2:	02 d0       	rcall	.+4      	; 0x5d8 <__divmodsi4_neg2>
- 5d4:	46 f4       	brtc	.+16     	; 0x5e6 <__divmodsi4_exit>
- 5d6:	08 c0       	rjmp	.+16     	; 0x5e8 <__negsi2>
-
-000005d8 <__divmodsi4_neg2>:
- 5d8:	50 95       	com	r21
- 5da:	40 95       	com	r20
- 5dc:	30 95       	com	r19
- 5de:	21 95       	neg	r18
- 5e0:	3f 4f       	sbci	r19, 0xFF	; 255
- 5e2:	4f 4f       	sbci	r20, 0xFF	; 255
- 5e4:	5f 4f       	sbci	r21, 0xFF	; 255
-
-000005e6 <__divmodsi4_exit>:
- 5e6:	08 95       	ret
-
-000005e8 <__negsi2>:
+000005e8 <__divmodhi4_neg1>:
  5e8:	90 95       	com	r25
- 5ea:	80 95       	com	r24
- 5ec:	70 95       	com	r23
- 5ee:	61 95       	neg	r22
- 5f0:	7f 4f       	sbci	r23, 0xFF	; 255
- 5f2:	8f 4f       	sbci	r24, 0xFF	; 255
- 5f4:	9f 4f       	sbci	r25, 0xFF	; 255
+ 5ea:	81 95       	neg	r24
+ 5ec:	9f 4f       	sbci	r25, 0xFF	; 255
+ 5ee:	08 95       	ret
+
+000005f0 <__divmodhi4_neg2>:
+ 5f0:	70 95       	com	r23
+ 5f2:	61 95       	neg	r22
+ 5f4:	7f 4f       	sbci	r23, 0xFF	; 255
+
+000005f6 <__divmodhi4_exit>:
  5f6:	08 95       	ret
 
-000005f8 <__muluhisi3>:
- 5f8:	31 d0       	rcall	.+98     	; 0x65c <__umulhisi3>
- 5fa:	a5 9f       	mul	r26, r21
- 5fc:	90 0d       	add	r25, r0
- 5fe:	b4 9f       	mul	r27, r20
- 600:	90 0d       	add	r25, r0
- 602:	a4 9f       	mul	r26, r20
- 604:	80 0d       	add	r24, r0
- 606:	91 1d       	adc	r25, r1
- 608:	11 24       	eor	r1, r1
- 60a:	08 95       	ret
+000005f8 <do_rand>:
+ 5f8:	8f 92       	push	r8
+ 5fa:	9f 92       	push	r9
+ 5fc:	af 92       	push	r10
+ 5fe:	bf 92       	push	r11
+ 600:	cf 92       	push	r12
+ 602:	df 92       	push	r13
+ 604:	ef 92       	push	r14
+ 606:	ff 92       	push	r15
+ 608:	cf 93       	push	r28
+ 60a:	df 93       	push	r29
+ 60c:	ec 01       	movw	r28, r24
+ 60e:	68 81       	ld	r22, Y
+ 610:	79 81       	ldd	r23, Y+1	; 0x01
+ 612:	8a 81       	ldd	r24, Y+2	; 0x02
+ 614:	9b 81       	ldd	r25, Y+3	; 0x03
+ 616:	61 15       	cp	r22, r1
+ 618:	71 05       	cpc	r23, r1
+ 61a:	81 05       	cpc	r24, r1
+ 61c:	91 05       	cpc	r25, r1
+ 61e:	21 f4       	brne	.+8      	; 0x628 <do_rand+0x30>
+ 620:	64 e2       	ldi	r22, 0x24	; 36
+ 622:	79 ed       	ldi	r23, 0xD9	; 217
+ 624:	8b e5       	ldi	r24, 0x5B	; 91
+ 626:	97 e0       	ldi	r25, 0x07	; 7
+ 628:	2d e1       	ldi	r18, 0x1D	; 29
+ 62a:	33 ef       	ldi	r19, 0xF3	; 243
+ 62c:	41 e0       	ldi	r20, 0x01	; 1
+ 62e:	50 e0       	ldi	r21, 0x00	; 0
+ 630:	38 d0       	rcall	.+112    	; 0x6a2 <__divmodsi4>
+ 632:	49 01       	movw	r8, r18
+ 634:	5a 01       	movw	r10, r20
+ 636:	9b 01       	movw	r18, r22
+ 638:	ac 01       	movw	r20, r24
+ 63a:	a7 ea       	ldi	r26, 0xA7	; 167
+ 63c:	b1 e4       	ldi	r27, 0x41	; 65
+ 63e:	4d d0       	rcall	.+154    	; 0x6da <__muluhisi3>
+ 640:	6b 01       	movw	r12, r22
+ 642:	7c 01       	movw	r14, r24
+ 644:	ac ee       	ldi	r26, 0xEC	; 236
+ 646:	b4 ef       	ldi	r27, 0xF4	; 244
+ 648:	a5 01       	movw	r20, r10
+ 64a:	94 01       	movw	r18, r8
+ 64c:	52 d0       	rcall	.+164    	; 0x6f2 <__mulohisi3>
+ 64e:	dc 01       	movw	r26, r24
+ 650:	cb 01       	movw	r24, r22
+ 652:	8c 0d       	add	r24, r12
+ 654:	9d 1d       	adc	r25, r13
+ 656:	ae 1d       	adc	r26, r14
+ 658:	bf 1d       	adc	r27, r15
+ 65a:	b7 ff       	sbrs	r27, 7
+ 65c:	03 c0       	rjmp	.+6      	; 0x664 <do_rand+0x6c>
+ 65e:	01 97       	sbiw	r24, 0x01	; 1
+ 660:	a1 09       	sbc	r26, r1
+ 662:	b0 48       	sbci	r27, 0x80	; 128
+ 664:	88 83       	st	Y, r24
+ 666:	99 83       	std	Y+1, r25	; 0x01
+ 668:	aa 83       	std	Y+2, r26	; 0x02
+ 66a:	bb 83       	std	Y+3, r27	; 0x03
+ 66c:	9f 77       	andi	r25, 0x7F	; 127
+ 66e:	df 91       	pop	r29
+ 670:	cf 91       	pop	r28
+ 672:	ff 90       	pop	r15
+ 674:	ef 90       	pop	r14
+ 676:	df 90       	pop	r13
+ 678:	cf 90       	pop	r12
+ 67a:	bf 90       	pop	r11
+ 67c:	af 90       	pop	r10
+ 67e:	9f 90       	pop	r9
+ 680:	8f 90       	pop	r8
+ 682:	08 95       	ret
 
-0000060c <__mulshisi3>:
- 60c:	b7 ff       	sbrs	r27, 7
- 60e:	f4 cf       	rjmp	.-24     	; 0x5f8 <__muluhisi3>
+00000684 <rand_r>:
+ 684:	b9 cf       	rjmp	.-142    	; 0x5f8 <do_rand>
 
-00000610 <__mulohisi3>:
- 610:	f3 df       	rcall	.-26     	; 0x5f8 <__muluhisi3>
- 612:	82 1b       	sub	r24, r18
- 614:	93 0b       	sbc	r25, r19
- 616:	08 95       	ret
+00000686 <rand>:
+ 686:	80 e0       	ldi	r24, 0x00	; 0
+ 688:	91 e0       	ldi	r25, 0x01	; 1
+ 68a:	b6 cf       	rjmp	.-148    	; 0x5f8 <do_rand>
 
-00000618 <__udivmodsi4>:
- 618:	a1 e2       	ldi	r26, 0x21	; 33
- 61a:	1a 2e       	mov	r1, r26
- 61c:	aa 1b       	sub	r26, r26
- 61e:	bb 1b       	sub	r27, r27
- 620:	fd 01       	movw	r30, r26
- 622:	0d c0       	rjmp	.+26     	; 0x63e <__udivmodsi4_ep>
+0000068c <srand>:
+ 68c:	a0 e0       	ldi	r26, 0x00	; 0
+ 68e:	b0 e0       	ldi	r27, 0x00	; 0
+ 690:	80 93 00 01 	sts	0x0100, r24
+ 694:	90 93 01 01 	sts	0x0101, r25
+ 698:	a0 93 02 01 	sts	0x0102, r26
+ 69c:	b0 93 03 01 	sts	0x0103, r27
+ 6a0:	08 95       	ret
 
-00000624 <__udivmodsi4_loop>:
- 624:	aa 1f       	adc	r26, r26
- 626:	bb 1f       	adc	r27, r27
- 628:	ee 1f       	adc	r30, r30
- 62a:	ff 1f       	adc	r31, r31
- 62c:	a2 17       	cp	r26, r18
- 62e:	b3 07       	cpc	r27, r19
- 630:	e4 07       	cpc	r30, r20
- 632:	f5 07       	cpc	r31, r21
- 634:	20 f0       	brcs	.+8      	; 0x63e <__udivmodsi4_ep>
- 636:	a2 1b       	sub	r26, r18
- 638:	b3 0b       	sbc	r27, r19
- 63a:	e4 0b       	sbc	r30, r20
- 63c:	f5 0b       	sbc	r31, r21
+000006a2 <__divmodsi4>:
+ 6a2:	05 2e       	mov	r0, r21
+ 6a4:	97 fb       	bst	r25, 7
+ 6a6:	16 f4       	brtc	.+4      	; 0x6ac <__divmodsi4+0xa>
+ 6a8:	00 94       	com	r0
+ 6aa:	0f d0       	rcall	.+30     	; 0x6ca <__negsi2>
+ 6ac:	57 fd       	sbrc	r21, 7
+ 6ae:	05 d0       	rcall	.+10     	; 0x6ba <__divmodsi4_neg2>
+ 6b0:	24 d0       	rcall	.+72     	; 0x6fa <__udivmodsi4>
+ 6b2:	07 fc       	sbrc	r0, 7
+ 6b4:	02 d0       	rcall	.+4      	; 0x6ba <__divmodsi4_neg2>
+ 6b6:	46 f4       	brtc	.+16     	; 0x6c8 <__divmodsi4_exit>
+ 6b8:	08 c0       	rjmp	.+16     	; 0x6ca <__negsi2>
 
-0000063e <__udivmodsi4_ep>:
- 63e:	66 1f       	adc	r22, r22
- 640:	77 1f       	adc	r23, r23
- 642:	88 1f       	adc	r24, r24
- 644:	99 1f       	adc	r25, r25
- 646:	1a 94       	dec	r1
- 648:	69 f7       	brne	.-38     	; 0x624 <__udivmodsi4_loop>
- 64a:	60 95       	com	r22
- 64c:	70 95       	com	r23
- 64e:	80 95       	com	r24
- 650:	90 95       	com	r25
- 652:	9b 01       	movw	r18, r22
- 654:	ac 01       	movw	r20, r24
- 656:	bd 01       	movw	r22, r26
- 658:	cf 01       	movw	r24, r30
- 65a:	08 95       	ret
+000006ba <__divmodsi4_neg2>:
+ 6ba:	50 95       	com	r21
+ 6bc:	40 95       	com	r20
+ 6be:	30 95       	com	r19
+ 6c0:	21 95       	neg	r18
+ 6c2:	3f 4f       	sbci	r19, 0xFF	; 255
+ 6c4:	4f 4f       	sbci	r20, 0xFF	; 255
+ 6c6:	5f 4f       	sbci	r21, 0xFF	; 255
 
-0000065c <__umulhisi3>:
- 65c:	a2 9f       	mul	r26, r18
- 65e:	b0 01       	movw	r22, r0
- 660:	b3 9f       	mul	r27, r19
- 662:	c0 01       	movw	r24, r0
- 664:	a3 9f       	mul	r26, r19
- 666:	70 0d       	add	r23, r0
- 668:	81 1d       	adc	r24, r1
- 66a:	11 24       	eor	r1, r1
- 66c:	91 1d       	adc	r25, r1
- 66e:	b2 9f       	mul	r27, r18
- 670:	70 0d       	add	r23, r0
- 672:	81 1d       	adc	r24, r1
- 674:	11 24       	eor	r1, r1
- 676:	91 1d       	adc	r25, r1
- 678:	08 95       	ret
+000006c8 <__divmodsi4_exit>:
+ 6c8:	08 95       	ret
 
-0000067a <_exit>:
- 67a:	f8 94       	cli
+000006ca <__negsi2>:
+ 6ca:	90 95       	com	r25
+ 6cc:	80 95       	com	r24
+ 6ce:	70 95       	com	r23
+ 6d0:	61 95       	neg	r22
+ 6d2:	7f 4f       	sbci	r23, 0xFF	; 255
+ 6d4:	8f 4f       	sbci	r24, 0xFF	; 255
+ 6d6:	9f 4f       	sbci	r25, 0xFF	; 255
+ 6d8:	08 95       	ret
 
-0000067c <__stop_program>:
- 67c:	ff cf       	rjmp	.-2      	; 0x67c <__stop_program>
+000006da <__muluhisi3>:
+ 6da:	31 d0       	rcall	.+98     	; 0x73e <__umulhisi3>
+ 6dc:	a5 9f       	mul	r26, r21
+ 6de:	90 0d       	add	r25, r0
+ 6e0:	b4 9f       	mul	r27, r20
+ 6e2:	90 0d       	add	r25, r0
+ 6e4:	a4 9f       	mul	r26, r20
+ 6e6:	80 0d       	add	r24, r0
+ 6e8:	91 1d       	adc	r25, r1
+ 6ea:	11 24       	eor	r1, r1
+ 6ec:	08 95       	ret
+
+000006ee <__mulshisi3>:
+ 6ee:	b7 ff       	sbrs	r27, 7
+ 6f0:	f4 cf       	rjmp	.-24     	; 0x6da <__muluhisi3>
+
+000006f2 <__mulohisi3>:
+ 6f2:	f3 df       	rcall	.-26     	; 0x6da <__muluhisi3>
+ 6f4:	82 1b       	sub	r24, r18
+ 6f6:	93 0b       	sbc	r25, r19
+ 6f8:	08 95       	ret
+
+000006fa <__udivmodsi4>:
+ 6fa:	a1 e2       	ldi	r26, 0x21	; 33
+ 6fc:	1a 2e       	mov	r1, r26
+ 6fe:	aa 1b       	sub	r26, r26
+ 700:	bb 1b       	sub	r27, r27
+ 702:	fd 01       	movw	r30, r26
+ 704:	0d c0       	rjmp	.+26     	; 0x720 <__udivmodsi4_ep>
+
+00000706 <__udivmodsi4_loop>:
+ 706:	aa 1f       	adc	r26, r26
+ 708:	bb 1f       	adc	r27, r27
+ 70a:	ee 1f       	adc	r30, r30
+ 70c:	ff 1f       	adc	r31, r31
+ 70e:	a2 17       	cp	r26, r18
+ 710:	b3 07       	cpc	r27, r19
+ 712:	e4 07       	cpc	r30, r20
+ 714:	f5 07       	cpc	r31, r21
+ 716:	20 f0       	brcs	.+8      	; 0x720 <__udivmodsi4_ep>
+ 718:	a2 1b       	sub	r26, r18
+ 71a:	b3 0b       	sbc	r27, r19
+ 71c:	e4 0b       	sbc	r30, r20
+ 71e:	f5 0b       	sbc	r31, r21
+
+00000720 <__udivmodsi4_ep>:
+ 720:	66 1f       	adc	r22, r22
+ 722:	77 1f       	adc	r23, r23
+ 724:	88 1f       	adc	r24, r24
+ 726:	99 1f       	adc	r25, r25
+ 728:	1a 94       	dec	r1
+ 72a:	69 f7       	brne	.-38     	; 0x706 <__udivmodsi4_loop>
+ 72c:	60 95       	com	r22
+ 72e:	70 95       	com	r23
+ 730:	80 95       	com	r24
+ 732:	90 95       	com	r25
+ 734:	9b 01       	movw	r18, r22
+ 736:	ac 01       	movw	r20, r24
+ 738:	bd 01       	movw	r22, r26
+ 73a:	cf 01       	movw	r24, r30
+ 73c:	08 95       	ret
+
+0000073e <__umulhisi3>:
+ 73e:	a2 9f       	mul	r26, r18
+ 740:	b0 01       	movw	r22, r0
+ 742:	b3 9f       	mul	r27, r19
+ 744:	c0 01       	movw	r24, r0
+ 746:	a3 9f       	mul	r26, r19
+ 748:	70 0d       	add	r23, r0
+ 74a:	81 1d       	adc	r24, r1
+ 74c:	11 24       	eor	r1, r1
+ 74e:	91 1d       	adc	r25, r1
+ 750:	b2 9f       	mul	r27, r18
+ 752:	70 0d       	add	r23, r0
+ 754:	81 1d       	adc	r24, r1
+ 756:	11 24       	eor	r1, r1
+ 758:	91 1d       	adc	r25, r1
+ 75a:	08 95       	ret
+
+0000075c <_exit>:
+ 75c:	f8 94       	cli
+
+0000075e <__stop_program>:
+ 75e:	ff cf       	rjmp	.-2      	; 0x75e <__stop_program>
