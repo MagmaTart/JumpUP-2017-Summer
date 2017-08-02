@@ -16,8 +16,8 @@
 #define CPU_CLOCK 16000000
 
 /* To control Mole LEDs easily */
-#define DDR_MOLE     DDRB
-#define PORT_MOLE    PORTB
+#define DDR_MOLE            DDRB
+#define PORT_MOLE           PORTB
 
 /* To control Level LEDs easily */
 #define DDR_LEVEL_PORT_C    DDRC
@@ -26,16 +26,15 @@
 #define LEVEL_PORT_E        PORTE
 #define BUZZER              PORT6
 
-#define BAUD_RATE       19200
-#define BAUD_RATE_L     (CPU_CLOCK / (16l * BAUD_RATE)) -1
+#define BAUD_RATE           19200
+#define BAUD_RATE_L         (CPU_CLOCK / (16l * BAUD_RATE)) -1
 
 /* To remember each mole's position */
-#define MOLE0 PORT7
-#define MOLE1 PORT6
-#define MOLE2 PORT5
-#define MOLE3 PORT4
+#define MOLE0               PORT7
+#define MOLE1               PORT6
+#define MOLE2               PORT5
+#define MOLE3               PORT4
 
-volatile unsigned char led = 0x00;                       // Mole LEDs' status
 volatile unsigned int catched = 0;                       // Catched mole number
 volatile unsigned int missed = 0;                        // Missed mole number
 volatile unsigned int level = 1;                         // Game Level : High is more difficult
@@ -51,12 +50,13 @@ volatile unsigned int new_mole_delay = 1500;             // Delay of set new mol
 void init_interrupt()
 {
     /* External Interrupt Initializing */
-    /* Use INT0, INT1, INT2, INT3 */
+    /* Use INT0, INT1, INT2, INT3 : PD0. PD1, PD2, PD3 */
 
     EICRA |= (1<<ISC01) | (0<<ISC00) | (1<<ISC11) | (0<<ISC10) | (1<<ISC21) | (0<<ISC20) | (1<<ISC31) | (0<<ISC30);
     EIMSK |= (1<<INT0) | (1<<INT1) | (1<<INT2) | (1<<INT3);
 }
 
+//Low pitch Buzzer
 void buzzer()
 {
     int i=0;
@@ -70,6 +70,7 @@ void buzzer()
     }
 }
 
+//High pitch Buzzer
 void buzzer_high()
 {
     int i=0;
@@ -85,7 +86,7 @@ void buzzer_high()
 
 void kill_mole(int num)
 {
-    int moles[4] = { MOLE0, MOLE1, MOLE2, MOLE3 };
+    int moles[4] = { MOLE0, MOLE1, MOLE2, MOLE3 };      //To iteration
 
     if(mole_status[num])
     {
@@ -125,22 +126,28 @@ ISR(INT3_vect)
 void new_mole(int new)
 {
     mole_status[new] = 1;
-    mole_living_times[new] = next_mole_living_times;
+    mole_living_times[new] = next_mole_living_times;        //Set new living time at that position
 
-    switch(new){
-    case 0:
+    //Light that position
+    switch(new)
+    {
+        case 0:
         PORT_MOLE |= (1<<MOLE0);
         break;
-    case 1:
+
+        case 1:
         PORT_MOLE |= (1<<MOLE1);
         break;
-    case 2:
+
+        case 2:
         PORT_MOLE |= (1<<MOLE2);
         break;
-    case 3:
+
+        case 3:
         PORT_MOLE |= (1<<MOLE3);
         break;
-    default:
+
+        default:
         break;
     }
 }
@@ -148,17 +155,21 @@ void new_mole(int new)
 /* Kill old mole that over its living time */
 void shutdown_mole(int mole_number)
 {
-    switch(mole_number){
-    case 0:
+    switch(mole_number)
+    {
+        case 0:
         PORT_MOLE &= ~((1<<MOLE0) & 0xff);
         break;
-    case 1:
+
+        case 1:
         PORT_MOLE &= ~((1<<MOLE1) & 0xff);
         break;
-    case 2:
+
+        case 2:
         PORT_MOLE &= ~((1<<MOLE2) & 0xff);
         break;
-    case 3:
+
+        case 3:
         PORT_MOLE &= ~((1<<MOLE3) & 0xff);
         break;
     }
@@ -170,30 +181,37 @@ void shutdown_mole(int mole_number)
 /* Increase difficulty */
 void level_up(void)
 {
-    switch(level){
-    case 1:
+    switch(level)
+    {
+        case 1:
         LEVEL_PORT_C |= (1<<PORT6);
         break;
-    case 2:
+
+        case 2:
         LEVEL_PORT_C &= ~((1<<PORT6) & 0xff);
         LEVEL_PORT_C |= (1<<PORT7);
         break;
-    case 3:
+
+        case 3:
         LEVEL_PORT_C &= ~((1<<PORT7) & 0xff);
         LEVEL_PORT_E |= (1<<PORT6);
         break;
-    case 4:
+
+        case 4:
         LEVEL_PORT_E &= ~((1<<PORT6) & 0xff);
         LEVEL_PORT_C |= (1<<PORT6) | (1<<PORT7);
         break;
-    case 5:
+
+        case 5:
         LEVEL_PORT_C &= ~((1<<PORT7) & 0xff);
         LEVEL_PORT_E |= (1<<PORT6);
         break;
-    case 6:
+
+        case 6:
         LEVEL_PORT_C |= (1<<PORT7);
         break;
-    default:
+
+        default:
         break;
     }
 
@@ -206,11 +224,11 @@ void level_up(void)
 void gameover(void)
 {
     int i=0;
-    for(i=0;i<3;i++)
+    for( i=0 ; i<3 ; i++ )
     {
-        PORT_MOLE |= (1<<PORT4) | (1<<PORT5) | (1<<PORT6) | (1<<PORT7);
+        PORT_MOLE |= (1 << PORT4) | (1 << PORT5) | (1 << PORT6) | (1 << PORT7);
         buzzer_high();
-        PORT_MOLE &= ~(((1<<PORT4) | (1<<PORT5) | (1<<PORT6) | (1<<PORT7)) & 0xff);
+        PORT_MOLE &= ~(((1 << PORT4) | (1 << PORT5) | (1 << PORT6) | (1 << PORT7)) & 0xff);
         _delay_ms(150);
     }
 }
@@ -225,19 +243,17 @@ int main(void)
     DDR_MOLE = 0xff;
     PORT_MOLE = 0x00;
 
-    DDR_LEVEL_PORT_C |= (1<<PORT6) | (1<<PORT7);    //PC6 : Green, PC7 : Yellow
-    DDR_LEVEL_PORT_E |= (1<<PORT6);                 //PE7 : Red
-    LEVEL_PORT_C = 0x00;
+    DDR_LEVEL_PORT_C |= (1 << PORT6) | (1 << PORT7);    // PC6 : Green, PC7 : Yellow
+    DDR_LEVEL_PORT_E |= (1 << PORT6);                   // PE7 : Red
+    LEVEL_PORT_C = 0x00;                                // Level show port initializing
     LEVEL_PORT_E = 0x00;
 
-    DDRD |= (1<<BUZZER);                            //Buzzer port setting : PD6
+    DDRD |= (1 << BUZZER);                            //Buzzer port setting : PD6
 
     init_interrupt();
 
     sei();
     /*Unlock Interrupt */
-
-
 
     /* Start Motion is not implemented, replaced to delay function */
     _delay_ms(3000);
@@ -253,11 +269,16 @@ int main(void)
         for(i=0;i<4;i++)
         {
             /* If current position's mole is live */
-            if( mole_status[i] ){
+            if( mole_status[i] )
+            {
                 mole_living_times[i]--;
-                if( !mole_living_times[i] ) shutdown_mole(i);       //Living time over : shutdown mole
+
+                if( !mole_living_times[i] )
+                {
+                    shutdown_mole(i);       //Living time over : shutdown mole
+                }
             }
-            else
+            else 
             {
                 mole_living_times[i] = 0;
             }
@@ -270,7 +291,10 @@ int main(void)
         {
             new = rand() % 4;
             
-            if( !mole_status[new] ) new_mole(new);
+            if( !mole_status[new] )
+            {
+                new_mole(new);
+            }
 
             new_mole_delay = next_mole_set_delay;
         }
