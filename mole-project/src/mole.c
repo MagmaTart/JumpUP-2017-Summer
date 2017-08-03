@@ -13,22 +13,24 @@
 #include <util/delay.h>
 #include <stdlib.h>
 
-#define CPU_CLOCK           16000000
-
 /* To control Mole LEDs easily */
+/* LEDs port : PB4, PB5, PB6, PB7 */
 #define DDR_MOLE            DDRB
 #define PORT_MOLE           PORTB
 
 /* To control Level LEDs easily */
+/* Level port : PC6, PC7, PE6 */
 #define DDR_LEVEL_PORT_C    DDRC
 #define DDR_LEVEL_PORT_E    DDRE
 #define LEVEL_PORT_C        PORTC
 #define LEVEL_PORT_E        PORTE
-#define BUZZER              PORT6
-#define BUZZER_DELAY        700
 
-#define BAUD_RATE           19200
-
+/* To control Buzzer */
+#define BUZZER              PORT6       // Buzzer port : PD6
+#define BUZZER_DELAY        700         // Make good sound
+#define CATCH_MOLE          0           // Parameter of buzzer()
+#define COUNTDOWN           0           // Parameter of buzzer()
+#define GAME_OVER           1           // Parameter of buzzer()
 
 /* To remember each mole's position */
 #define MOLE0               PORT7
@@ -36,32 +38,65 @@
 #define MOLE2               PORT5
 #define MOLE3               PORT4
 
-volatile unsigned int catched = 0;                       // Catched mole number
-volatile unsigned int missed = 0;                        // Missed mole number
-volatile unsigned int level = 1;                         // Game Level : High is more difficult
-volatile unsigned int next_mole_living_times = 1200;     // Living time of mole that will be setting new 
-volatile unsigned int next_mole_set_delay = 1200;        // Delay of set new moles : Use to Level Up
+/* About game */
+#define INITIAL_DELAY       1300
 
-volatile unsigned int mole_status[4] = {0, 0, 0, 0};                        // Is that mole live? (Live : 1, Died : 0)
-volatile unsigned int mole_living_times[4] = { 1200, 1200, 1200, 1200 };      // Current Living time of mole in that position
+volatile unsigned int catched = 0;                                // Catched mole number
+volatile unsigned int missed = 0;                                 // Missed mole number
+volatile unsigned int level = 1;                                  // Game Level : High is more difficult
+volatile unsigned int next_mole_living_times = INITIAL_DELAY;     // Living time of mole that will be setting new 
+volatile unsigned int next_mole_set_delay = INITIAL_DELAY;        // Delay of set new moles : Use to Level Up
 
-volatile unsigned int new_mole_delay = 1200;             // Delay of set new moles
+volatile unsigned int mole_status[4] = {0, 0, 0, 0};              // Is that mole live? (Live : 1, Died : 0)
+volatile unsigned int mole_living_times[4] = { 
+                                               INITIAL_DELAY,
+                                               INITIAL_DELAY,
+                                               INITIAL_DELAY,
+                                               INITIAL_DELAY 
+                                             };                   // Current Living time of mole in that position
+
+volatile unsigned int new_mole_delay = INITIAL_DELAY;                      // Delay of set new moles
 
 /* Interrupt Initializing */
 void init_interrupt()
 {
-    /* External Interrupt Initializing */
-    /* Use INT0, INT1, INT2, INT3 : PD0. PD1, PD2, PD3 */
+    /*
+       External Interrupt Initializing
+       Use INT0, INT1, INT2, INT3 : PD0. PD1, PD2, PD3 
+       Interrupt occurs at Falling edge
+    */
+
 
     EICRA |= (1<<ISC01) | (0<<ISC00) | (1<<ISC11) | (0<<ISC10) | (1<<ISC21) | (0<<ISC20) | (1<<ISC31) | (0<<ISC30);
     EIMSK |= (1<<INT0) | (1<<INT1) | (1<<INT2) | (1<<INT3);
 }
 
-//Low pitch Buzzer
-void buzzer()
+void init_GPIO(void)
+{
+    /*
+        Initializing GPIO ports
+        Moles LEDs ports are DDR_MOLE and PORT_MOLE, what is B
+        Levels LEDs ports are C ports and E ports
+    */
+
+    DDR_MOLE = 0xff;
+    PORT_MOLE = 0x00;
+
+    DDR_LEVEL_PORT_C |= (1 << PORT6) | (1 << PORT7);    // PC6 : Green, PC7 : Yellow
+    DDR_LEVEL_PORT_E |= (1 << PORT6);                   // PE7 : Red
+    LEVEL_PORT_C = 0x00;                                // Level show port initializing
+    LEVEL_PORT_E = 0x00;
+
+    DDRD |= (1 << BUZZER);                            //Buzzer port setting : PD6
+}
+
+// Make buzzer sound
+void buzzer(int is_gameover)
 {
     int i=0;
-    while(i<50)
+
+    // Make buzzer sounds long when game is over
+    while( i < 50+(is_gameover*1000) )
     {
         PORTD |= (1<<BUZZER);
         _delay_us(BUZZER_DELAY);
@@ -71,20 +106,7 @@ void buzzer()
     }
 }
 
-//High pitch Buzzer
-void buzzer_high()
-{
-    int i=0;
-    while(i<1000)
-    {
-        PORTD |= (1<<BUZZER);
-        _delay_us(BUZZER_DELAY);
-        PORTD &= ~((0<<BUZZER) | 0xff);
-        _delay_us(BUZZER_DELAY);
-        i++;
-    }
-}
-
+// Killing mole by user button input
 void kill_mole(int num)
 {
     int moles[4] = { MOLE0, MOLE1, MOLE2, MOLE3 };      //To iteration
@@ -93,7 +115,7 @@ void kill_mole(int num)
     {
         PORT_MOLE &= ~((1 << moles[num]) & 0xff);
         catched++;
-        buzzer();
+        buzzer(CATCH_MOLE);
         mole_status[num] = 0;
         mole_living_times[num] = 0;
     }
@@ -182,6 +204,7 @@ void shutdown_mole(int mole_number)
 /* Increase difficulty */
 void level_up(void)
 {
+    //Control LEDs showing level
     switch(level)
     {
         case 1:
@@ -222,13 +245,46 @@ void level_up(void)
     next_mole_living_times -= 150;
 }
 
+// Let user know game was over
 void gameover(void)
 {
-    int i=0;
+    int i;
+    
+    //PORT_MOLE &= ~(((1<<MOLE0) | (1<<MOLE1) | (1<<MOLE2) | (1<<MOLE3)) & 0xff);
+    buzzer(GAME_OVER);
 
-    PORT_MOLE |= (1 << PORT4) | (1 << PORT5) | (1 << PORT6) | (1 << PORT7);
-    buzzer_high();
-    PORT_MOLE &= ~(((1 << PORT4) | (1 << PORT5) | (1 << PORT6) | (1 << PORT7)) & 0xff);
+    //Blink mole LEDs
+    for(i=0;i<10;i++)
+    {
+        PORT_MOLE |= (1 << PORT4) | (1 << PORT5) | (1 << PORT6) | (1 << PORT7);
+        _delay_ms(130);
+        PORT_MOLE &= ~(((1 << PORT4) | (1 << PORT5) | (1 << PORT6) | (1 << PORT7)) & 0xff);
+        _delay_ms(130);
+    }
+}
+
+// Give period of preparation to user
+void start_motion(void)
+{
+    int moles[4] = { MOLE0, MOLE1, MOLE2, MOLE3 };
+    int i;
+
+    for(i=0;i<4;i++)
+    {
+        PORT_MOLE |= (1<<moles[i]);
+    }
+
+    _delay_ms(3000);
+
+    for(i=3;i>0;i--)
+    {
+        PORT_MOLE &= ~((1<<moles[i]) & 0xff);
+        buzzer(COUNTDOWN);
+        _delay_ms(1000);
+    }
+
+    PORT_MOLE = 0x00;
+    _delay_ms(2500);
 }
 
 int main(void)
@@ -238,26 +294,16 @@ int main(void)
 
     int i, new;
 
-    DDR_MOLE = 0xff;
-    PORT_MOLE = 0x00;
+    init_GPIO();                    // Initializing GPIO ports
 
-    DDR_LEVEL_PORT_C |= (1 << PORT6) | (1 << PORT7);    // PC6 : Green, PC7 : Yellow
-    DDR_LEVEL_PORT_E |= (1 << PORT6);                   // PE7 : Red
-    LEVEL_PORT_C = 0x00;                                // Level show port initializing
-    LEVEL_PORT_E = 0x00;
-
-    DDRD |= (1 << BUZZER);                            //Buzzer port setting : PD6
-
-    init_interrupt();
+    init_interrupt();               // Initializing Interrupts
 
     sei();
     /*Unlock Interrupt */
 
-    /* Start Motion is not implemented, replaced to delay function */
-    _delay_ms(3000);
+    start_motion();
 
-    /* Set start mole and show */
-    new_mole(rand() % 4);
+    new_mole(rand() % 4);           //Set initial mole and show
 
     while(1)
     {
@@ -275,10 +321,6 @@ int main(void)
                 {
                     shutdown_mole(i);       //Living time over : shutdown mole
                 }
-            }
-            else 
-            {
-                mole_living_times[i] = 0;
             }
         }
 
