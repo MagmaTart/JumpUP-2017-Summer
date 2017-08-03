@@ -13,7 +13,7 @@
 #include <util/delay.h>
 #include <stdlib.h>
 
-#define CPU_CLOCK 16000000
+#define CPU_CLOCK           16000000
 
 /* To control Mole LEDs easily */
 #define DDR_MOLE            DDRB
@@ -25,9 +25,10 @@
 #define LEVEL_PORT_C        PORTC
 #define LEVEL_PORT_E        PORTE
 #define BUZZER              PORT6
+#define BUZZER_DELAY        700
 
 #define BAUD_RATE           19200
-#define BAUD_RATE_L         (CPU_CLOCK / (16l * BAUD_RATE)) -1
+
 
 /* To remember each mole's position */
 #define MOLE0               PORT7
@@ -38,13 +39,13 @@
 volatile unsigned int catched = 0;                       // Catched mole number
 volatile unsigned int missed = 0;                        // Missed mole number
 volatile unsigned int level = 1;                         // Game Level : High is more difficult
-volatile unsigned int next_mole_living_times = 1500;     // Living time of mole that will be setting new 
-volatile unsigned int next_mole_set_delay = 1500;        // Delay of set new moles : Use to Level Up
+volatile unsigned int next_mole_living_times = 1200;     // Living time of mole that will be setting new 
+volatile unsigned int next_mole_set_delay = 1200;        // Delay of set new moles : Use to Level Up
 
 volatile unsigned int mole_status[4] = {0, 0, 0, 0};                        // Is that mole live? (Live : 1, Died : 0)
-volatile unsigned int mole_living_times[4] = {1500, 1500, 1500, 1500};      // Current Living time of mole in that position
+volatile unsigned int mole_living_times[4] = { 1200, 1200, 1200, 1200 };      // Current Living time of mole in that position
 
-volatile unsigned int new_mole_delay = 1500;             // Delay of set new moles
+volatile unsigned int new_mole_delay = 1200;             // Delay of set new moles
 
 /* Interrupt Initializing */
 void init_interrupt()
@@ -63,9 +64,9 @@ void buzzer()
     while(i<50)
     {
         PORTD |= (1<<BUZZER);
-        _delay_us(700);
+        _delay_us(BUZZER_DELAY);
         PORTD &= ~((0<<BUZZER) | 0xFF);
-        _delay_us(700);
+        _delay_us(BUZZER_DELAY);
         i++;
     }
 }
@@ -74,12 +75,12 @@ void buzzer()
 void buzzer_high()
 {
     int i=0;
-    while(i<50)
+    while(i<1000)
     {
         PORTD |= (1<<BUZZER);
-        _delay_us(500);
+        _delay_us(BUZZER_DELAY);
         PORTD &= ~((0<<BUZZER) | 0xff);
-        _delay_us(500);
+        _delay_us(BUZZER_DELAY);
         i++;
     }
 }
@@ -217,20 +218,17 @@ void level_up(void)
 
     level++;
 
-    next_mole_set_delay -= 200;
-    next_mole_living_times -= 200;
+    next_mole_set_delay -= 150;
+    next_mole_living_times -= 150;
 }
 
 void gameover(void)
 {
     int i=0;
-    for( i=0 ; i<3 ; i++ )
-    {
-        PORT_MOLE |= (1 << PORT4) | (1 << PORT5) | (1 << PORT6) | (1 << PORT7);
-        buzzer_high();
-        PORT_MOLE &= ~(((1 << PORT4) | (1 << PORT5) | (1 << PORT6) | (1 << PORT7)) & 0xff);
-        _delay_ms(150);
-    }
+
+    PORT_MOLE |= (1 << PORT4) | (1 << PORT5) | (1 << PORT6) | (1 << PORT7);
+    buzzer_high();
+    PORT_MOLE &= ~(((1 << PORT4) | (1 << PORT5) | (1 << PORT6) | (1 << PORT7)) & 0xff);
 }
 
 int main(void)
@@ -300,7 +298,7 @@ int main(void)
         }
 
         /* Level Up : Level 0 to 6*/
-        if( catched > 0 && catched % 20 == 0 && catched <= 140)
+        if( catched > 0 && catched % 15 == 0 && catched <= 15 * 7)
         {
             catched++;
             level_up();
